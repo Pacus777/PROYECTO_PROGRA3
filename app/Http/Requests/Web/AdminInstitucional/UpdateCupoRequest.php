@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests\Web\AdminInstitucional;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateCupoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'total_cup' => ['required', 'integer', 'min:0'],
+            'disponibles_cup' => ['required', 'integer', 'min:0'],
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            if ((int) $this->input('disponibles_cup') > (int) $this->input('total_cup')) {
+                $validator->errors()->add('disponibles_cup', 'Disponibles no puede superar total.');
+            }
+        });
+    }
+}
+

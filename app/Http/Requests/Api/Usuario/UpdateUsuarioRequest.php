@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Requests\Api\Usuario;
+
+use App\Models\Usuario;
+use App\Support\Roles;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdateUsuarioRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        /** @var Usuario|null $usuario */
+        $usuario = $this->route('usuario');
+
+        return [
+            'id_rol_usu' => ['sometimes', 'integer', 'exists:rol,id_rol'],
+            'id_ued_usu' => ['nullable', 'integer', 'exists:unidad_educativa,id_ued'],
+            'correo_usu' => [
+                'sometimes',
+                'string',
+                'email',
+                'max:160',
+                Rule::unique('usuario', 'correo_usu')->ignore($usuario?->id_usu, 'id_usu'),
+            ],
+            'password_usu' => ['sometimes', 'nullable', 'string', 'min:8'],
+            'activo_usu' => ['sometimes', 'boolean'],
+            'nombres_per' => ['sometimes', 'string', 'max:120'],
+            'ap_paterno_per' => ['sometimes', 'string', 'max:80'],
+            'ap_materno_per' => ['nullable', 'string', 'max:80'],
+            'ci_per' => [
+                'nullable',
+                'string',
+                'max:32',
+                Rule::unique('persona', 'ci_per')->ignore($usuario?->id_per_usu, 'id_per'),
+            ],
+            'fecha_nac_per' => ['nullable', 'date'],
+            'genero_per' => ['nullable', 'string', 'size:1'],
+            'correo_per' => ['nullable', 'string', 'email', 'max:160'],
+            'telefono_per' => ['nullable', 'string', 'max:40'],
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            $rolId = (int) ($this->input('id_rol_usu') ?? $this->route('usuario')?->id_rol_usu);
+            $uedId = $this->input('id_ued_usu', $this->route('usuario')?->id_ued_usu);
+            $rol = \App\Models\Rol::query()->find($rolId);
+
+            if ($rol && $rol->nombre_rol === Roles::ADMIN_INSTITUCIONAL && empty($uedId)) {
+                $validator->errors()->add('id_ued_usu', 'El administrador institucional debe tener unidad educativa asignada.');
+            }
+        });
+    }
+}
