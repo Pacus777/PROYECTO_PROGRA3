@@ -40,6 +40,26 @@
                 <div><dt class="text-slate-500">Rol</dt><dd class="font-semibold text-slate-900">{{ $usuario->rol->nombre_rol ?? '—' }}</dd></div>
                 <div><dt class="text-slate-500">Unidad educativa</dt><dd class="font-semibold text-slate-900">{{ $usuario->unidadEducativa->nombre_ued ?? '—' }}</dd></div>
                 <div><dt class="text-slate-500">Estado</dt><dd class="font-semibold text-slate-900">{{ $usuario->activo_usu ? 'Activo' : 'Inactivo' }}</dd></div>
+                @if($isTutorRole)
+                    <div>
+                        <dt class="text-slate-500">Perfil tutor</dt>
+                        <dd class="font-semibold {{ $hasTutorProfile ? 'text-emerald-700' : 'text-rose-700' }}">
+                            {{ $hasTutorProfile ? 'Vinculado correctamente' : 'Falta registro en tabla tutor' }}
+                        </dd>
+                    </div>
+                    @if($hasTutorProfile)
+                        <div>
+                            <dt class="text-slate-500">Estudiantes</dt>
+                            <dd>
+                                <a href="{{ route('admin.tutores.estudiantes.index', $tutorProfile) }}"
+                                   class="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 transition hover:text-indigo-800">
+                                    Gestionar estudiantes vinculados
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </dd>
+                        </div>
+                    @endif
+                @endif
             </dl>
         </div>
         <div class="rounded-2xl bg-white p-6 shadow-sm">
@@ -52,6 +72,13 @@
             </dl>
         </div>
     </div>
+
+    @if($isTutorRole && ! $hasTutorProfile)
+        <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+            <p class="font-semibold">Integridad pendiente para rol tutor.</p>
+            <p class="mt-1 text-sm text-amber-800">Este usuario tiene rol tutor, pero no existe su fila vinculada en la tabla tutor.</p>
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('admin.usuarios.destroy', $usuario) }}" class="mt-8" onsubmit="return confirm('¿Eliminar definitivamente este usuario?');">
         @csrf

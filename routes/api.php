@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EstudianteController;
+use App\Http\Controllers\Api\GestionController;
 use App\Http\Controllers\Api\PostulacionController;
+use App\Http\Controllers\Api\TutorController;
 use App\Http\Controllers\Api\UnidadEducativaController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Support\Roles;
@@ -18,11 +20,18 @@ Route::prefix('v1')->group(function (): void {
 
         Route::middleware('role:'.Roles::ADMIN_GENERAL)->group(function (): void {
             Route::apiResource('usuarios', UsuarioController::class);
+            Route::apiResource('gestiones', GestionController::class)->except(['index', 'show']);
+            Route::post('tutores/{tutor}/estudiantes', [TutorController::class, 'attach']);
+            Route::delete('tutores/{tutor}/estudiantes/{estudiante}', [TutorController::class, 'detach']);
         });
 
         Route::middleware('role:'.Roles::ADMIN_GENERAL.','.Roles::ADMIN_INSTITUCIONAL)->group(function (): void {
             Route::apiResource('unidad-educativas', UnidadEducativaController::class);
             Route::apiResource('estudiantes', EstudianteController::class);
+            Route::apiResource('gestiones', GestionController::class)->only(['index', 'show']);
+            Route::get('tutores', [TutorController::class, 'index']);
+            Route::get('tutores/{tutor}', [TutorController::class, 'show']);
+            Route::get('tutores/{tutor}/estudiantes', [TutorController::class, 'estudiantes']);
         });
 
         Route::middleware('role:'.Roles::ADMIN_GENERAL.','.Roles::ADMIN_INSTITUCIONAL.','.Roles::TUTOR)->group(function (): void {

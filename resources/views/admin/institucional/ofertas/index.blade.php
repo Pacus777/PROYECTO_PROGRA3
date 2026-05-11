@@ -15,7 +15,7 @@
 
     <form method="POST" action="{{ route('admin.institucional.ofertas.store') }}" class="mb-8 grid gap-3 rounded-2xl bg-white p-5 shadow-sm md:grid-cols-3">
         @csrf
-        <select name="id_ges_oac" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">@foreach($gestiones as $g)<option value="{{ $g->id_ges }}">{{ $g->nombre_ges }}</option>@endforeach</select>
+        <select name="id_ges_oac" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">@foreach($gestiones as $g)<option value="{{ $g->id_ges }}" @selected(old('id_ges_oac', $gestionActiva?->id_ges) == $g->id_ges)>{{ $g->nombre_ges }}</option>@endforeach</select>
         <select name="id_niv_oac" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">@foreach($niveles as $n)<option value="{{ $n->id_niv }}">{{ $n->nombre_niv }}</option>@endforeach</select>
         <select name="id_cur_oac" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">@foreach($cursos as $c)<option value="{{ $c->id_cur }}">{{ $c->nombre_cur }}</option>@endforeach</select>
         <select name="id_par_oac" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">@foreach($paralelos as $p)<option value="{{ $p->id_par }}">{{ $p->nombre_par }}</option>@endforeach</select>

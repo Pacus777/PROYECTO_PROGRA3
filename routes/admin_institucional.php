@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\AdminInstitucional\AcademicController;
 use App\Http\Controllers\Web\AdminInstitucional\AsignacionController;
 use App\Http\Controllers\Web\AdminInstitucional\CupoController;
 use App\Http\Controllers\Web\AdminInstitucional\DashboardController;
+use App\Http\Controllers\Web\AdminInstitucional\DocumentoController;
 use App\Http\Controllers\Web\AdminInstitucional\EvaluacionController;
 use App\Http\Controllers\Web\AdminInstitucional\OfertaController;
 use App\Http\Controllers\Web\AdminInstitucional\PostulacionController;
@@ -43,3 +44,7 @@ Route::delete('/evaluaciones/{evaluacion}', [EvaluacionController::class, 'destr
 
 Route::get('/resultados', [ResultadoController::class, 'index'])->name('resultados.index');
 Route::post('/asignacion/ejecutar', [AsignacionController::class, 'store'])->name('asignacion.store');
+
+Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+Route::patch('/documentos/{documento}/estado', [DocumentoController::class, 'updateEstado'])->name('documentos.estado');
+Route::get('/documentos/{documento}/download', [DocumentoController::class, 'download'])->name('documentos.download');

@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Models\Persona;
+use App\Models\Rol;
+use App\Models\Tutor;
 use App\Models\Usuario;
 use App\Repositories\UsuarioRepository;
+use App\Support\Roles;
 use Illuminate\Support\Facades\DB;
 
 class UsuarioService
@@ -37,7 +40,7 @@ class UsuarioService
                 'telefono_per' => $data['telefono_per'] ?? null,
             ]);
 
-            return $this->repository->create([
+            $usuario = $this->repository->create([
                 'id_rol_usu' => $data['id_rol_usu'],
                 'id_per_usu' => $persona->id_per,
                 'id_ued_usu' => $data['id_ued_usu'] ?? null,
@@ -45,6 +48,10 @@ class UsuarioService
                 'password_usu' => $data['password_usu'],
                 'activo_usu' => $data['activo_usu'] ?? true,
             ]);
+
+            $this->syncTutorProfileForUsuario($usuario, (int) $data['id_rol_usu']);
+
+            return $usuario;
         });
     }
 
@@ -74,6 +81,9 @@ class UsuarioService
             if ($usuarioData !== []) {
                 $usuario->update($usuarioData);
             }
+
+            $usuario->refresh();
+            $this->syncTutorProfileForUsuario($usuario);
         });
 
         return $usuario->fresh(['persona', 'rol', 'unidadEducativa']);
@@ -84,5 +94,26 @@ class UsuarioService
         DB::transaction(function () use ($usuario) {
             $usuario->delete();
         });
+    }
+
+    private function syncTutorProfileForUsuario(Usuario $usuario, ?int $rolId = null): void
+    {
+        if ($usuario->id_per_usu === null) {
+            return;
+        }
+
+        $effectiveRolId = $rolId ?? (int) $usuario->id_rol_usu;
+        $isTutorRole = Rol::query()
+            ->where('id_rol', $effectiveRolId)
+            ->where('nombre_rol', Roles::TUTOR)
+            ->exists();
+
+        if (! $isTutorRole) {
+            return;
+        }
+
+        Tutor::query()->firstOrCreate([
+            'id_per_tut' => $usuario->id_per_usu,
+        ]);
     }
 }

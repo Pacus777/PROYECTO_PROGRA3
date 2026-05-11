@@ -57,6 +57,18 @@
                 <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21h16M6 21V7l6-4 6 4v14M9 9h.01M9 12h.01M9 15h.01M15 9h.01M15 12h.01M15 15h.01"/></svg>
                 <span x-show="sidebarOpen" x-transition>Unidades Educativas</span>
             </a>
+            <a href="{{ route('admin.estudiantes.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.estudiantes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/></svg>
+                <span x-show="sidebarOpen" x-transition>Estudiantes</span>
+            </a>
+            <a href="{{ route('admin.tutores.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.tutores.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <span x-show="sidebarOpen" x-transition>Tutores</span>
+            </a>
+            <a href="{{ route('admin.gestiones.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.gestiones.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span x-show="sidebarOpen" x-transition>Gestiones</span>
+            </a>
 
             <p class="px-4 pb-2 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400" x-show="sidebarOpen">Reportes</p>
             @foreach([['Reportes','chart-bar'],['Configuración','cog']] as $extra)
@@ -149,8 +161,13 @@
                 <span x-show="sidebarOpen" x-transition>Asignación</span>
             </a>
 
+            <a href="{{ route('admin.institucional.documentos.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.documentos.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h8l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 3v5h5"/></svg>
+                <span x-show="sidebarOpen" x-transition>Documentos / OCR</span>
+            </a>
+
             <p class="px-4 pb-2 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400" x-show="sidebarOpen">Próximamente</p>
-            @foreach([['Lista de Espera','clock'],['Documentos / OCR','doc'],['Historial','archive'],['Reportes','chart']] as $coming)
+            @foreach([['Lista de Espera','clock'],['Historial','archive'],['Reportes','chart']] as $coming)
                 <a href="#" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-indigo-50 hover:text-indigo-700">
                     @if($coming[1] === 'clock')
                         <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

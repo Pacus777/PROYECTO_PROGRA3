@@ -29,11 +29,12 @@ class OfertaController extends BaseInstitutionalController
             ->paginate(15);
 
         $gestiones = Gestion::query()->orderByDesc('id_ges')->get();
+        $gestionActiva = $gestiones->firstWhere('activa_ges', true);
         $niveles = Nivel::query()->orderBy('nombre_niv')->get();
         $cursos = Curso::query()->with('nivel')->orderBy('nombre_cur')->get();
         $paralelos = Paralelo::query()->with('curso')->orderBy('nombre_par')->get();
 
-        return view('admin.institucional.ofertas.index', compact('ofertas', 'gestiones', 'niveles', 'cursos', 'paralelos'));
+        return view('admin.institucional.ofertas.index', compact('ofertas', 'gestiones', 'gestionActiva', 'niveles', 'cursos', 'paralelos'));
     }
 
     public function store(StoreOfertaAcademicaRequest $request): RedirectResponse
@@ -62,11 +63,12 @@ class OfertaController extends BaseInstitutionalController
 
         $oferta_academica->load('cupos');
         $gestiones = Gestion::query()->orderByDesc('id_ges')->get();
+        $gestionActiva = $gestiones->firstWhere('activa_ges', true);
         $niveles = Nivel::query()->orderBy('nombre_niv')->get();
         $cursos = Curso::query()->with('nivel')->orderBy('nombre_cur')->get();
         $paralelos = Paralelo::query()->with('curso')->orderBy('nombre_par')->get();
 
-        return view('admin.institucional.ofertas.edit', compact('oferta_academica', 'gestiones', 'niveles', 'cursos', 'paralelos'));
+        return view('admin.institucional.ofertas.edit', compact('oferta_academica', 'gestiones', 'gestionActiva', 'niveles', 'cursos', 'paralelos'));
     }
 
     public function update(UpdateOfertaAcademicaRequest $request, OfertaAcademica $oferta_academica): RedirectResponse

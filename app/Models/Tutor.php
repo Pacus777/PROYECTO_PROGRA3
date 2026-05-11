@@ -21,6 +21,11 @@ class Tutor extends Model
         return $this->belongsTo(Persona::class, 'id_per_tut', 'id_per');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'id_tut';
+    }
+
     public function estudiantes(): BelongsToMany
     {
         return $this->belongsToMany(Estudiante::class, 'estudiante_tutor', 'id_tut_ett', 'id_est_ett')

@@ -18,6 +18,11 @@ class Estudiante extends Model
         'codigo_est',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'id_est';
+    }
+
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_per_est', 'id_per');

@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Admin\Usuario\StoreUsuarioRequest;
 use App\Http\Requests\Web\Admin\Usuario\UpdateUsuarioRequest;
 use App\Models\Rol;
+use App\Models\Tutor;
 use App\Models\UnidadEducativa;
 use App\Models\Usuario;
 use App\Services\UsuarioService;
+use App\Support\Roles;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,7 +53,13 @@ class UsuarioController extends Controller
     {
         $usuario->load(['persona', 'rol', 'unidadEducativa']);
 
-        return view('admin.usuarios.show', compact('usuario'));
+        $isTutorRole = ($usuario->rol->nombre_rol ?? '') === Roles::TUTOR;
+        $tutorProfile = $isTutorRole
+            ? Tutor::query()->where('id_per_tut', $usuario->id_per_usu)->first()
+            : null;
+        $hasTutorProfile = $tutorProfile !== null;
+
+        return view('admin.usuarios.show', compact('usuario', 'isTutorRole', 'hasTutorProfile', 'tutorProfile'));
     }
 
     public function edit(Usuario $usuario): View

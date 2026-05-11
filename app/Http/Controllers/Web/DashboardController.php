@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\EstadoPostulacion;
+use App\Models\Gestion;
 use App\Models\Postulacion;
 use App\Models\Tutor;
+use App\Models\UnidadEducativa;
 use App\Models\Usuario;
 use App\Support\Roles;
 use Illuminate\Contracts\View\View;
@@ -24,11 +26,32 @@ class DashboardController extends Controller
             ->findOrFail($usuarioId);
 
         $tutorDashboard = $this->buildTutorDashboardContext($usuario);
+        $adminStats = $this->buildAdminGeneralStats($usuario);
 
         return view('dashboard', [
             'usuario' => $usuario,
             'tutorDashboard' => $tutorDashboard,
+            'adminStats' => $adminStats,
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildAdminGeneralStats(Usuario $usuario): array
+    {
+        if (($usuario->rol->nombre_rol ?? '') !== Roles::ADMIN_GENERAL) {
+            return [];
+        }
+
+        $gestionActiva = Gestion::query()->where('activa_ges', true)->first();
+
+        return [
+            'usuarios' => Usuario::query()->count(),
+            'unidades' => UnidadEducativa::query()->count(),
+            'gestiones' => Gestion::query()->count(),
+            'gestion_activa' => $gestionActiva?->nombre_ges ?? 'Ninguna',
+        ];
     }
 
     /**

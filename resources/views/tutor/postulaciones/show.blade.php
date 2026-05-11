@@ -85,9 +85,25 @@
         </section>
 
         <section class="rounded-2xl bg-white p-6 shadow-sm lg:col-span-2">
-            <h2 class="mb-4 text-lg font-semibold text-slate-800">Documentos</h2>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-800">Documentos</h2>
+                <a href="{{ route('tutor.documentos.create', $postulacion) }}"
+                   class="inline-flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 transition hover:bg-teal-100">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Subir documento
+                </a>
+            </div>
+
+            @php
+                $estadoClasses = [
+                    'pendiente'  => 'bg-amber-50 text-amber-700',
+                    'verificado' => 'bg-emerald-50 text-emerald-700',
+                    'rechazado'  => 'bg-rose-50 text-rose-700',
+                ];
+            @endphp
+
             @if($postulacion->documentos->isEmpty())
-                <p class="text-sm text-slate-500">No hay documentos asociados.</p>
+                <p class="text-sm text-slate-500">No hay documentos adjuntos. Usa el botón para subir uno.</p>
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -95,15 +111,40 @@
                             <tr>
                                 <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-slate-400">Tipo</th>
                                 <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-slate-400">Estado</th>
-                                <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-slate-400">Ruta</th>
+                                <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-slate-400">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @foreach($postulacion->documentos as $doc)
+                                @php $cls = $estadoClasses[$doc->estado_doc] ?? 'bg-slate-100 text-slate-600'; @endphp
                                 <tr>
-                                    <td class="px-4 py-2">{{ $doc->tipoDocumento->nombre_tdo ?? '—' }}</td>
-                                    <td class="px-4 py-2">{{ $doc->estado_doc ?? '—' }}</td>
-                                    <td class="px-4 py-2 font-mono text-xs text-slate-600 break-all">{{ $doc->ruta_archivo_doc ?? '—' }}</td>
+                                    <td class="px-4 py-2 font-medium text-slate-800">{{ $doc->tipoDocumento->nombre_tdo ?? '—' }}</td>
+                                    <td class="px-4 py-2">
+                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $cls }}">
+                                            {{ $doc->estado_doc ?? 'pendiente' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 text-right">
+                                        <div class="inline-flex items-center gap-2">
+                                            <a href="{{ route('tutor.documentos.download', $doc) }}"
+                                               class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200">
+                                                Descargar
+                                            </a>
+                                            @if($doc->estado_doc === 'pendiente')
+                                                <form method="POST"
+                                                      action="{{ route('tutor.documentos.destroy', $doc) }}"
+                                                      class="inline"
+                                                      onsubmit="return confirm('¿Eliminar este documento?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            class="rounded-lg bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100">
+                                                        Eliminar
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

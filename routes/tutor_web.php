@@ -18,6 +18,8 @@ Route::middleware(['web.auth', 'web.role:tutor'])
         Route::get('/', TutorDashboardController::class)->name('dashboard');
 
         Route::get('/estudiantes', [TutorEstudianteController::class, 'index'])->name('estudiantes.index');
+        Route::post('/estudiantes', [TutorEstudianteController::class, 'store'])->name('estudiantes.store');
+        Route::delete('/estudiantes/{estudiante}', [TutorEstudianteController::class, 'destroy'])->name('estudiantes.destroy');
 
         Route::get('/postulaciones', [TutorPostulacionController::class, 'index'])->name('postulaciones.index');
         Route::get('/postulaciones/create', [TutorPostulacionController::class, 'create'])->name('postulaciones.create');
@@ -25,6 +27,10 @@ Route::middleware(['web.auth', 'web.role:tutor'])
         Route::get('/postulaciones/{postulacion}', [TutorPostulacionController::class, 'show'])->name('postulaciones.show');
 
         Route::get('/documentos', [TutorDocumentoController::class, 'index'])->name('documentos.index');
+        Route::get('/documentos/{documento}/download', [TutorDocumentoController::class, 'download'])->name('documentos.download');
+        Route::delete('/documentos/{documento}', [TutorDocumentoController::class, 'destroy'])->name('documentos.destroy');
+        Route::get('/postulaciones/{postulacion}/documentos/create', [TutorDocumentoController::class, 'create'])->name('documentos.create');
+        Route::post('/postulaciones/{postulacion}/documentos', [TutorDocumentoController::class, 'store'])->name('documentos.store');
 
         Route::get('/seguimiento', [TutorSeguimientoController::class, 'index'])->name('seguimiento.index');
 

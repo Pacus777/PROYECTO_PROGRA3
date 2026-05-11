@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Persona;
 use App\Models\Rol;
+use App\Models\Tutor;
 use App\Models\Usuario;
 use App\Repositories\UsuarioRepository;
 use App\Support\Roles;
@@ -46,6 +47,10 @@ class AuthService
                 'correo_usu' => $data['correo_usu'],
                 'password_usu' => $data['password_usu'],
                 'activo_usu' => true,
+            ]);
+
+            Tutor::query()->firstOrCreate([
+                'id_per_tut' => $persona->id_per,
             ]);
 
             $token = $usuario->createToken('api')->plainTextToken;
