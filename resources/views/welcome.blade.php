@@ -12,7 +12,7 @@
                 Instituciones educativas que confían en nosotros
             </p>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center text-center">
-                @foreach (['Colegio San Marcos', 'IE Libertad', 'Centro Educativo Norte', 'Colegio Andino', 'Instituto Horizonte', 'Unidad Educativa Sur'] as $logo)
+                @foreach (['Colegio San Marcos', 'IE Libertad', 'Centro Educativo Norte', 'Instituto Horizonte', 'Unidad Educativa Sur'] as $logo)
                     <div class="text-slate-300 font-bold text-xl tracking-tight opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
                         {{ $logo }}
                     </div>
