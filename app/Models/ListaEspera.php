@@ -26,4 +26,9 @@ class ListaEspera extends Model
     {
         return $this->belongsTo(OfertaAcademica::class, 'id_oac_les', 'id_oac');
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'id_les';
+    }
 }

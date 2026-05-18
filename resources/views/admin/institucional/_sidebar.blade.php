@@ -16,4 +16,16 @@
 <a href="{{ route('admin.institucional.resultados.index') }}" class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.institucional.resultados.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-700' }} transition-colors">
     Resultados
 </a>
+<a href="{{ route('admin.institucional.asignacion.index') }}" class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.institucional.asignacion.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-700' }} transition-colors">
+    Asignación
+</a>
+<a href="{{ route('admin.institucional.lista-espera.index') }}" class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.institucional.lista-espera.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-700' }} transition-colors">
+    Lista de espera
+</a>
+<a href="{{ route('admin.institucional.historial.index') }}" class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.institucional.historial.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-700' }} transition-colors">
+    Historial
+</a>
+<a href="{{ route('admin.institucional.reportes.index') }}" class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.institucional.reportes.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-700' }} transition-colors">
+    Reportes
+</a>
 
