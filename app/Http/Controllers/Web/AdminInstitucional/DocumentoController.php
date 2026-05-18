@@ -9,6 +9,7 @@ use App\Services\DocumentoService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DocumentoController extends BaseInstitutionalController
@@ -25,10 +26,16 @@ class DocumentoController extends BaseInstitutionalController
 
         $query = Documento::query()
             ->whereHas('postulacion.ofertaAcademica', fn ($q) => $q->where('id_ued_oac', $unidadId))
-            ->with(['postulacion.estudiante.persona', 'tipoDocumento', 'procesamientoOcr'])
+            ->with([
+                'postulacion.estudiante.persona',
+                'postulacion.ofertaAcademica.curso',
+                'postulacion.ofertaAcademica.paralelo',
+                'tipoDocumento',
+                'procesamientoOcr',
+            ])
             ->orderByDesc('id_doc');
 
-        if (in_array($estado, ['pendiente', 'verificado', 'rechazado'], true)) {
+        if (in_array($estado, ['pendiente', 'verificado', 'observado', 'rechazado'], true)) {
             $query->where('estado_doc', $estado);
         }
 
@@ -39,14 +46,21 @@ class DocumentoController extends BaseInstitutionalController
 
     public function updateEstado(Request $request, Documento $documento): RedirectResponse
     {
-        $request->validate([
-            'estado_doc' => ['required', 'in:pendiente,verificado,rechazado'],
+        $validated = $request->validate([
+            'estado_doc' => ['required', Rule::in(['pendiente', 'verificado', 'observado', 'rechazado'])],
+            'observacion_doc' => ['nullable', 'string', 'max:2000', 'required_if:estado_doc,observado,rechazado'],
+        ], [
+            'observacion_doc.required_if' => 'Debe escribir una observación cuando el documento sea observado o rechazado.',
         ]);
 
         $this->assertDocumentoBelongsToUnidad($documento, $this->unidadId($request));
 
         $estadoAnterior = $documento->estado_doc;
-        $this->service->updateEstado($documento, $request->input('estado_doc'));
+        $this->service->updateEstado(
+            $documento,
+            $validated['estado_doc'],
+            $validated['observacion_doc'] ?? null,
+        );
         $documento->refresh()->load('tipoDocumento', 'postulacion.estudiante.persona');
 
         $this->registrarActividad($request, 'documento', (int) $documento->id_doc, 'documento_estado', [

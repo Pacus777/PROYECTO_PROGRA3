@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Web\AdminInstitucional;
 
 use App\Services\ResultadoInstitucionalService;
+use App\Services\TutorCupoService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,15 @@ class AsignacionController extends BaseInstitutionalController
 {
     public function __construct(
         private readonly ResultadoInstitucionalService $service,
+        private readonly TutorCupoService $tutorCupoService,
     ) {}
 
     public function index(Request $request): View
     {
         $unidadId = $this->unidadId($request);
+
+        $this->tutorCupoService->procesarVencimientosPendientesPorUnidad($unidadId);
+
         $usuario = $this->webUsuario($request)->load('unidadEducativa');
 
         return view('admin.institucional.asignacion.index', [

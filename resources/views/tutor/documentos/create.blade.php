@@ -18,50 +18,66 @@
         <p class="mt-1 text-sm text-slate-500">Formatos permitidos: PDF, JPG, PNG. Máximo 5 MB.</p>
     </div>
 
-    <form method="POST"
-          action="{{ route('tutor.documentos.store', $postulacion) }}"
-          enctype="multipart/form-data"
-          class="max-w-xl rounded-2xl bg-white p-6 shadow-sm md:p-8">
-        @csrf
-
-        <div class="space-y-5">
-            <div>
-                <label for="id_tdo_doc" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Tipo de documento</label>
-                <select name="id_tdo_doc" id="id_tdo_doc"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option value="">Selecciona un tipo…</option>
-                    @foreach($tipos as $tipo)
-                        <option value="{{ $tipo->id_tdo }}" {{ old('id_tdo_doc') == $tipo->id_tdo ? 'selected' : '' }}>
-                            {{ $tipo->nombre_tdo }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('id_tdo_doc')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label for="archivo" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Archivo</label>
-                <div class="relative">
-                    <input type="file"
-                           name="archivo"
-                           id="archivo"
-                           accept=".pdf,.jpg,.jpeg,.png"
-                           class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition file:mr-4 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-teal-700 hover:file:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-300">
-                </div>
-                @error('archivo')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            </div>
+    @if(! $postulacion->ofertaAcademica->estaAbiertaParaPostulacion())
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+            <p class="font-semibold">No puedes realizar esta acción porque la oferta ya cerró su periodo de postulación.</p>
         </div>
+    @elseif($tipos->isEmpty())
+        <div class="max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-900">
+            <p class="font-semibold">No tienes documentos pendientes por cargar.</p>
+            <p class="mt-1 text-sm">Todos los documentos requeridos para esta oferta ya fueron cargados o están en revisión.</p>
 
-        <div class="mt-8 flex flex-wrap gap-3">
-            <button type="submit"
-                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-teal-700 hover:to-emerald-700">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Subir documento
-            </button>
             <a href="{{ route('tutor.postulaciones.show', $postulacion) }}"
-               class="inline-flex items-center rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                Cancelar
+               class="mt-4 inline-flex rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
+                Volver a la postulación
             </a>
         </div>
-    </form>
+    @else
+        <form method="POST"
+              action="{{ route('tutor.documentos.store', $postulacion) }}"
+              enctype="multipart/form-data"
+              class="max-w-xl rounded-2xl bg-white p-6 shadow-sm md:p-8">
+            @csrf
+
+            <div class="space-y-5">
+                <div>
+                    <label for="id_tdo_doc" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Tipo de documento</label>
+                    <select name="id_tdo_doc" id="id_tdo_doc"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                        <option value="">Selecciona un tipo…</option>
+                        @foreach($tipos as $tipo)
+                            <option value="{{ $tipo->id_tdo }}" {{ old('id_tdo_doc') == $tipo->id_tdo ? 'selected' : '' }}>
+                                {{ $tipo->nombre_tdo }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('id_tdo_doc')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label for="archivo" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Archivo</label>
+                    <div class="relative">
+                        <input type="file"
+                               name="archivo"
+                               id="archivo"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition file:mr-4 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-teal-700 hover:file:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    </div>
+                    @error('archivo')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-teal-700 hover:to-emerald-700">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Subir documento
+                </button>
+                <a href="{{ route('tutor.postulaciones.show', $postulacion) }}"
+                   class="inline-flex items-center rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    @endif
 @endsection

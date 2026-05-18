@@ -25,6 +25,8 @@ Route::middleware(['web.auth', 'web.role:tutor'])
         Route::get('/postulaciones/create', [TutorPostulacionController::class, 'create'])->name('postulaciones.create');
         Route::post('/postulaciones', [TutorPostulacionController::class, 'store'])->name('postulaciones.store');
         Route::get('/postulaciones/{postulacion}', [TutorPostulacionController::class, 'show'])->name('postulaciones.show');
+        Route::post('/postulaciones/{postulacion}/responder-cupo', [TutorPostulacionController::class, 'responderCupo'])
+            ->name('postulaciones.responder-cupo');
 
         Route::get('/documentos', [TutorDocumentoController::class, 'index'])->name('documentos.index');
         Route::get('/documentos/{documento}/download', [TutorDocumentoController::class, 'download'])->name('documentos.download');

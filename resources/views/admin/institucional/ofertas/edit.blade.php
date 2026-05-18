@@ -86,6 +86,64 @@
                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
         </div>
 
+        <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">Inicio de postulación</label>
+            <input type="datetime-local"
+                   name="fecha_inicio_postulacion_oac"
+                   value="{{ old('fecha_inicio_postulacion_oac', optional($oac->fecha_inicio_postulacion_oac)->format('Y-m-d\TH:i')) }}"
+                   required
+                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+            @error('fecha_inicio_postulacion_oac')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">Fin de postulación</label>
+            <input type="datetime-local"
+                   name="fecha_fin_postulacion_oac"
+                   value="{{ old('fecha_fin_postulacion_oac', optional($oac->fecha_fin_postulacion_oac)->format('Y-m-d\TH:i')) }}"
+                   required
+                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+            @error('fecha_fin_postulacion_oac')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        @php
+            $documentosSeleccionados = old(
+                'documentos_requeridos',
+                $oac->tiposDocumentoRequeridos->pluck('id_tdo')->map(fn ($id) => (string) $id)->all()
+            );
+        @endphp
+
+        <div class="md:col-span-2">
+            <label class="mb-2 block text-xs font-semibold text-slate-500">Documentos requeridos</label>
+
+            @if($tiposDocumento->isEmpty())
+                <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    No existen tipos de documento registrados.
+                </p>
+            @else
+                <div class="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 md:grid-cols-2">
+                    @foreach($tiposDocumento as $tipo)
+                        <label class="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                            <input type="checkbox"
+                                   name="documentos_requeridos[]"
+                                   value="{{ $tipo->id_tdo }}"
+                                   @checked(in_array((string) $tipo->id_tdo, array_map('strval', $documentosSeleccionados), true))
+                                   class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            <span>{{ $tipo->nombre_tdo }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            @endif
+
+            @error('documentos_requeridos')
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
+
         <div class="md:col-span-2 flex flex-wrap gap-3">
             <button type="submit" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Guardar oferta</button>
             <a href="{{ route('admin.institucional.ofertas.index') }}" class="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</a>

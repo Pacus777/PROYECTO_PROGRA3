@@ -17,7 +17,16 @@ class Documento extends Model
         'id_tdo_doc',
         'ruta_archivo_doc',
         'estado_doc',
+        'observacion_doc',
+        'fecha_revision_doc',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'fecha_revision_doc' => 'datetime',
+        ];
+    }
 
     public function postulacion(): BelongsTo
     {
@@ -32,5 +41,25 @@ class Documento extends Model
     public function procesamientoOcr(): HasOne
     {
         return $this->hasOne(ProcesamientoOcr::class, 'id_doc_poc', 'id_doc');
+    }
+
+    public function estaAprobado(): bool
+    {
+        return $this->estado_doc === 'verificado';
+    }
+
+    public function estaPendiente(): bool
+    {
+        return $this->estado_doc === 'pendiente';
+    }
+
+    public function estaObservado(): bool
+    {
+        return $this->estado_doc === 'observado';
+    }
+
+    public function estaRechazado(): bool
+    {
+        return $this->estado_doc === 'rechazado';
     }
 }

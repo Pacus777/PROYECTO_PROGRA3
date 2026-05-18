@@ -155,6 +155,17 @@
     <section class="mt-6 rounded-2xl bg-white p-6 shadow-sm">
         <h2 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">Evaluaciones (tabla evaluacion)</h2>
 
+        @php
+            $puedeEvaluar = $postulacion->documentosRequeridosVerificadosCompletos();
+        @endphp
+
+        @if(! $puedeEvaluar)
+            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <p class="font-semibold">Evaluación bloqueada</p>
+                <p class="mt-1">{{ $postulacion->mensajeBloqueoEvaluacion() }}</p>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('admin.institucional.evaluaciones.store', $postulacion) }}"
               class="mb-6 grid gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 md:grid-cols-4">
             @csrf
@@ -166,7 +177,11 @@
             </select>
             <input type="number" step="0.01" min="0" max="100" name="puntaje_eva" placeholder="puntaje_eva"
                    class="rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm">
-            <button class="rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700">Agregar</button>
+            <button type="submit"
+                    @disabled(! $puedeEvaluar)
+                    class="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300">
+                Guardar evaluación
+            </button>
             <textarea name="observaciones_eva" placeholder="observaciones_eva" rows="2"
                       class="md:col-span-4 rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm"></textarea>
         </form>

@@ -22,8 +22,14 @@ class EvaluacionController extends BaseInstitutionalController
     {
         $this->unidadId($request);
 
-        $criterios = Criterio::query()->with('tipoCriterio')->orderBy('id_cri')->paginate(20);
-        $tipos = TipoCriterio::query()->orderBy('nombre_tic')->get();
+        $criterios = Criterio::query()
+            ->with('tipoCriterio')
+            ->orderBy('id_cri')
+            ->paginate(20);
+
+        $tipos = TipoCriterio::query()
+            ->orderBy('nombre_tic')
+            ->get();
 
         return view('admin.institucional.evaluacion.criterios', compact('criterios', 'tipos'));
     }
@@ -31,26 +37,40 @@ class EvaluacionController extends BaseInstitutionalController
     public function store(StoreCriterioRequest $request): RedirectResponse
     {
         Criterio::query()->create($request->validated());
+
         return back()->with('success', 'Criterio creado.');
     }
 
     public function update(UpdateCriterioRequest $request, Criterio $criterio): RedirectResponse
     {
         $criterio->update($request->validated());
+
         return back()->with('success', 'Criterio actualizado.');
     }
 
     public function destroy(Criterio $criterio): RedirectResponse
     {
         $criterio->delete();
+
         return back()->with('success', 'Criterio eliminado.');
     }
 
     public function storeEvaluacion(StoreEvaluacionRequest $request, Postulacion $postulacion): RedirectResponse
     {
         $unidadId = $this->unidadId($request);
-        $postulacion->loadMissing('ofertaAcademica');
+
+        $postulacion->loadMissing([
+            'ofertaAcademica.tiposDocumentoRequeridos',
+            'documentos.tipoDocumento',
+        ]);
+
         $this->assertPostulacionBelongsToUnidad($postulacion, $unidadId);
+
+        if (! $postulacion->documentosRequeridosVerificadosCompletos()) {
+            return back()
+                ->withInput()
+                ->with('error', $postulacion->mensajeBloqueoEvaluacion());
+        }
 
         $evaluacion = Evaluacion::query()->updateOrCreate(
             [
@@ -74,8 +94,20 @@ class EvaluacionController extends BaseInstitutionalController
     public function updateEvaluacion(UpdateEvaluacionRequest $request, Evaluacion $evaluacion): RedirectResponse
     {
         $unidadId = $this->unidadId($request);
-        $evaluacion->loadMissing('postulacion.ofertaAcademica');
+
+        $evaluacion->loadMissing([
+            'postulacion.ofertaAcademica.tiposDocumentoRequeridos',
+            'postulacion.documentos.tipoDocumento',
+        ]);
+
         $this->assertPostulacionBelongsToUnidad($evaluacion->postulacion, $unidadId);
+
+        if (! $evaluacion->postulacion->documentosRequeridosVerificadosCompletos()) {
+            return back()
+                ->withInput()
+                ->with('error', $evaluacion->postulacion->mensajeBloqueoEvaluacion());
+        }
+
         $evaluacion->update($request->validated());
 
         return back()->with('success', 'Evaluación actualizada.');
@@ -84,11 +116,13 @@ class EvaluacionController extends BaseInstitutionalController
     public function destroyEvaluacion(Request $request, Evaluacion $evaluacion): RedirectResponse
     {
         $unidadId = $this->unidadId($request);
+
         $evaluacion->loadMissing('postulacion.ofertaAcademica');
+
         $this->assertPostulacionBelongsToUnidad($evaluacion->postulacion, $unidadId);
+
         $evaluacion->delete();
 
         return back()->with('success', 'Evaluación eliminada.');
     }
 }
-

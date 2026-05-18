@@ -12,6 +12,14 @@
         $pageSubtitle = $unidad
             ? trim($unidad->nombre_ued . ($unidad->codigo_ued ? ' (' . $unidad->codigo_ued . ')' : '')) . ' — ejecute la asignación automática según el ranking de su unidad.'
             : 'Cupos asignados tras el proceso de admisión.';
+
+        $estadoClasses = [
+            'asignado' => 'bg-indigo-50 text-indigo-700',
+            'pendiente' => 'bg-amber-50 text-amber-700',
+            'rechazado' => 'bg-rose-50 text-rose-700',
+            'aceptado' => 'bg-emerald-50 text-emerald-700',
+            'vencido' => 'bg-amber-50 text-amber-700',
+        ];
     @endphp
 
     <x-institucional.page module="asignacion" title="Asignación de cupos" :subtitle="$pageSubtitle">
@@ -78,7 +86,9 @@
                             <th class="px-4 py-3 text-xs font-semibold uppercase">Postulante</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase">Oferta</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase">Puntaje</th>
+                            <th class="px-4 py-3 text-xs font-semibold uppercase">Estado</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase">Fecha</th>
+                            <th class="px-4 py-3 text-xs font-semibold uppercase">Fecha límite</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -102,11 +112,19 @@
                                 <td class="px-4 py-3 font-bold text-orange-700">
                                     {{ $p?->resultado ? number_format((float) $p->resultado->puntaje_total_res, 2) : '—' }}
                                 </td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $estadoClasses[$asi->estado_asi] ?? 'bg-slate-100 text-slate-700' }}">
+                                        {{ $asi->estado_asi ?? '—' }}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-3 text-slate-600">{{ $asi->fecha_asi?->format('d/m/Y H:i') ?? '—' }}</td>
+                                <td class="px-4 py-3 text-slate-600">
+                                    {{ $asi->fecha_limite_respuesta_asi?->format('d/m/Y H:i') ?? '—' }}
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-12 text-center text-slate-500">
+                                <td colspan="6" class="px-4 py-12 text-center text-slate-500">
                                     No hay cupos asignados aún. Ejecute la asignación cuando haya evaluaciones y cupos configurados.
                                 </td>
                             </tr>

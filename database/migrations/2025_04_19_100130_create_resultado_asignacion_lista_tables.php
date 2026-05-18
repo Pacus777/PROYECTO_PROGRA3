@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_cup_asi')->nullable();
             $table->string('estado_asi', 40)->default('pendiente');
             $table->timestamp('fecha_asi')->nullable();
+            $table->timestamp('fecha_limite_respuesta_asi')->nullable();
             $table->timestamps();
 
             $table->foreign('id_pos_asi')->references('id_pos')->on('postulacion')->cascadeOnDelete();

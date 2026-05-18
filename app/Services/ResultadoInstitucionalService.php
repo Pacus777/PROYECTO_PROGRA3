@@ -245,6 +245,7 @@ final class ResultadoInstitucionalService
                             'id_cup_asi' => $cupo->id_cup,
                             'estado_asi' => 'asignado',
                             'fecha_asi' => now(),
+                            'fecha_limite_respuesta_asi' => now()->addHours(TutorCupoService::HORAS_LIMITE_RESPUESTA),
                         ]);
                         $disponibles--;
                         $stats['asignados']++;

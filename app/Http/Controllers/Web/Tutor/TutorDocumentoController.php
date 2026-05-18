@@ -41,8 +41,26 @@ class TutorDocumentoController extends Controller
     public function create(Request $request, Postulacion $postulacion): View
     {
         $this->assertPostulacionBelongsToTutor($request, $postulacion);
+        abort_unless($postulacion->ofertaAcademica->estaAbiertaParaPostulacion(), 403, 'No se pueden subir documentos fuera del periodo de postulación.');
 
-        $tipos = TipoDocumento::query()->orderBy('nombre_tdo')->get();
+        $postulacion->loadMissing([
+            'ofertaAcademica.tiposDocumentoRequeridos',
+            'documentos',
+        ]);
+
+        $tiposYaCargados = $postulacion->documentos
+            ->whereIn('estado_doc', ['pendiente', 'verificado'])
+            ->pluck('id_tdo_doc')
+            ->map(fn ($id): int => (int) $id)
+            ->all();
+
+        $tipos = $postulacion->ofertaAcademica
+            ? $postulacion->ofertaAcademica
+                ->tiposDocumentoRequeridos()
+                ->whereNotIn('tipo_documento.id_tdo', $tiposYaCargados)
+                ->orderBy('nombre_tdo')
+                ->get()
+            : collect();
 
         return view('tutor.documentos.create', compact('postulacion', 'tipos'));
     }
@@ -50,6 +68,7 @@ class TutorDocumentoController extends Controller
     public function store(StoreDocumentoRequest $request, Postulacion $postulacion): RedirectResponse
     {
         $this->assertPostulacionBelongsToTutor($request, $postulacion);
+        abort_unless($postulacion->ofertaAcademica->estaAbiertaParaPostulacion(), 403, 'No se pueden subir documentos fuera del periodo de postulación.');
 
         $this->service->upload(
             $postulacion,

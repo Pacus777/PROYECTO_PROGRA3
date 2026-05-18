@@ -72,13 +72,13 @@
 
         <x-institucional.panel module="ofertas" title="Nueva oferta">
             <section class="p-5"
-                     x-data="ofertaForm({
+                    x-data="ofertaForm({
                         cursos: @js($cursosParaJs),
                         paralelos: @js($paralelosParaJs),
                         nivelId: '{{ old('id_niv_oac') }}',
                         cursoId: '{{ old('id_cur_oac') }}',
                         paraleloId: '{{ old('id_par_oac') }}'
-                     })">
+                    })">
                 <form method="POST" action="{{ route('admin.institucional.ofertas.store') }}" class="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
                     @csrf
                     <div>
@@ -123,17 +123,69 @@
                     <div class="md:col-span-2">
                         <label class="mb-1 block text-xs font-semibold text-slate-500">Descripción</label>
                         <input name="descripcion_oac" value="{{ old('descripcion_oac') }}" maxlength="255" placeholder="Opcional"
-                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
                     </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-500">Inicio de postulación</label>
+                        <input type="datetime-local"
+                            name="fecha_inicio_postulacion_oac"
+                            value="{{ old('fecha_inicio_postulacion_oac') }}"
+                            required
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+                        @error('fecha_inicio_postulacion_oac')
+                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-500">Fin de postulación</label>
+                        <input type="datetime-local"
+                            name="fecha_fin_postulacion_oac"
+                            value="{{ old('fecha_fin_postulacion_oac') }}"
+                            required
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+                        @error('fecha_fin_postulacion_oac')
+                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="md:col-span-3 lg:col-span-4">
+                        <label class="mb-2 block text-xs font-semibold text-slate-500">Documentos requeridos</label>
+
+                        @if($tiposDocumento->isEmpty())
+                            <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                No existen tipos de documento registrados.
+                            </p>
+                        @else
+                            <div class="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 md:grid-cols-2 lg:grid-cols-3">
+                                @foreach($tiposDocumento as $tipo)
+                                    <label class="flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                                        <input type="checkbox"
+                                               name="documentos_requeridos[]"
+                                               value="{{ $tipo->id_tdo }}"
+                                               @checked(in_array((string) $tipo->id_tdo, old('documentos_requeridos', []), true))
+                                               class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                        <span>{{ $tipo->nombre_tdo }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @error('documentos_requeridos')
+                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-slate-500">Cupos total</label>
                         <input type="number" min="0" name="total_cup" value="{{ old('total_cup', 0) }}"
-                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
                     </div>
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-slate-500">Cupos disponibles</label>
                         <input type="number" min="0" name="disponibles_cup" value="{{ old('disponibles_cup', 0) }}"
-                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm">
                         @error('disponibles_cup')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                     </div>
                     <div class="flex items-end">
@@ -151,6 +203,7 @@
                             <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Gestión</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Nivel / curso / paralelo</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Descripción</th>
+                            <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Convocatoria</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Cupos</th>
                             <th class="px-4 py-3 text-xs font-semibold uppercase text-slate-400">Postul.</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-slate-400">Acciones</th>
@@ -166,6 +219,38 @@
                                     <p class="text-xs text-slate-500">{{ $oferta->curso->nombre_cur ?? '—' }} · Paralelo {{ $oferta->paralelo->nombre_par ?? '—' }}</p>
                                 </td>
                                 <td class="px-4 py-3 text-slate-600">{{ $oferta->descripcion_oac ?: '—' }}</td>
+                                <td class="px-4 py-3 text-slate-600">
+                                    @switch($oferta->estadoConvocatoria())
+                                        @case('abierta')
+                                            <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">Abierta</span>
+                                            @break
+                                        @case('proxima')
+                                            <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">Próxima</span>
+                                            @break
+                                        @case('cerrada')
+                                            <span class="inline-flex rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">Cerrada</span>
+                                            @break
+                                        @default
+                                            <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">—</span>
+                                    @endswitch
+
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ optional($oferta->fecha_inicio_postulacion_oac)->format('d/m/Y H:i') }}
+                                        -
+                                        {{ optional($oferta->fecha_fin_postulacion_oac)->format('d/m/Y H:i') }}
+                                    </p>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex max-w-xs flex-wrap gap-1">
+                                        @forelse($oferta->tiposDocumentoRequeridos as $tipo)
+                                            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                                                {{ $tipo->nombre_tdo }}
+                                            </span>
+                                        @empty
+                                            <span class="text-xs text-slate-400">Sin documentos</span>
+                                        @endforelse
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3">
                                     @if($cupo)
                                         <form method="POST" action="{{ route('admin.institucional.cupos.update', $cupo) }}" class="flex flex-wrap items-center gap-2">
@@ -204,7 +289,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-12 text-center text-slate-500">
+                                <td colspan="8" class="px-4 py-12 text-center text-slate-500">
                                     No hay ofertas para su unidad. Registre la primera arriba o revise el
                                     <a href="{{ route('admin.institucional.academic.index') }}" class="text-indigo-600 hover:underline">catálogo académico</a>.
                                 </td>
