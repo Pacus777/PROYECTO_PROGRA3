@@ -66,23 +66,32 @@
     <div class="md:col-span-2 pt-4">
         <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide border-b border-slate-200 pb-2">Cuenta</h3>
     </div>
-    <div>
-        <label for="id_rol_usu" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Rol</label>
+    @php
+        $roleHints = $roles->mapWithKeys(fn ($rol) => [(string) $rol->id_rol => \App\Support\Roles::description($rol->nombre_rol)])->all();
+        $selectedRolId = (string) old('id_rol_usu', $u->id_rol_usu ?? $roles->first()?->id_rol ?? '');
+    @endphp
+    <div x-data="{ hints: @js($roleHints), selected: @js($selectedRolId) }">
+        <label for="id_rol_usu" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Tipo de cuenta</label>
         <select name="id_rol_usu" id="id_rol_usu" required
+                @change="selected = $event.target.value"
                 class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition">
             @foreach($roles as $rol)
-                <option value="{{ $rol->id_rol }}" @selected(old('id_rol_usu', $u->id_rol_usu ?? '') == $rol->id_rol)>{{ $rol->nombre_rol }}</option>
+                <option value="{{ $rol->id_rol }}" @selected(old('id_rol_usu', $u->id_rol_usu ?? '') == $rol->id_rol)>{{ \App\Support\Roles::label($rol->nombre_rol) }}</option>
             @endforeach
         </select>
+        <p class="mt-2 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-900 leading-relaxed" x-show="hints[selected]" x-text="hints[selected]"></p>
         @error('id_rol_usu')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
     </div>
     <div>
-        <label for="id_ued_usu" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Unidad educativa (opcional)</label>
+        <label for="id_ued_usu" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Unidad educativa (código UE)</label>
+        <p class="mb-1.5 text-xs text-slate-500">Obligatorio solo para <strong>Unidad educativa (director / secretaría)</strong>: la cuenta queda ligada a ese colegio. No aplica al tutor ni al RUDE del estudiante.</p>
         <select name="id_ued_usu" id="id_ued_usu"
                 class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition">
             <option value="">— Sin asignar —</option>
             @foreach($unidades as $unidad)
-                <option value="{{ $unidad->id_ued }}" @selected(old('id_ued_usu', $u->id_ued_usu ?? '') == $unidad->id_ued)>{{ $unidad->nombre_ued }}</option>
+                <option value="{{ $unidad->id_ued }}" @selected(old('id_ued_usu', $u->id_ued_usu ?? '') == $unidad->id_ued)>
+                    @if($unidad->codigo_ued)[{{ $unidad->codigo_ued }}] @endif{{ $unidad->nombre_ued }}
+                </option>
             @endforeach
         </select>
         @error('id_ued_usu')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror

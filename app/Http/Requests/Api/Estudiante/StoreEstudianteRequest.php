@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Estudiante;
 
+use App\Support\EstudianteIdentificador;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEstudianteRequest extends FormRequest
@@ -17,6 +18,7 @@ class StoreEstudianteRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'rude_est' => ['nullable', 'string', 'regex:'.EstudianteIdentificador::RUDE_REGEX, 'unique:estudiante,rude_est'],
             'codigo_est' => ['nullable', 'string', 'max:40', 'unique:estudiante,codigo_est'],
             'nombres_per' => ['required', 'string', 'max:120'],
             'ap_paterno_per' => ['required', 'string', 'max:80'],

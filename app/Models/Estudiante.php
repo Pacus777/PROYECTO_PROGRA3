@@ -16,6 +16,8 @@ class Estudiante extends Model
     protected $fillable = [
         'id_per_est',
         'codigo_est',
+        'rude_est',
+        'id_ued_mat_est',
     ];
 
     public function getRouteKeyName(): string
@@ -26,6 +28,12 @@ class Estudiante extends Model
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_per_est', 'id_per');
+    }
+
+    /** Unidad educativa donde está matriculado actualmente (el RUDE no cambia al trasladarse). */
+    public function unidadMatriculaActual(): BelongsTo
+    {
+        return $this->belongsTo(UnidadEducativa::class, 'id_ued_mat_est', 'id_ued');
     }
 
     public function tutores(): BelongsToMany

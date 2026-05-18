@@ -26,4 +26,6 @@
     <x-landing.about />
     <x-landing.cta-banner />
     <x-landing.footer />
+
+    <x-tutor.assistant-widget context="landing" />
 @endsection

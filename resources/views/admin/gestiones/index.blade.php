@@ -12,7 +12,7 @@
         <div>
             <p class="text-xs text-slate-400">Panel / Gestiones</p>
             <h1 class="text-2xl font-bold text-slate-900">Gestiones</h1>
-            <p class="mt-1 text-sm text-slate-500">Períodos globales del sistema (solo una puede estar activa).</p>
+            <p class="mt-1 text-sm text-slate-500">Períodos de admisión a nivel nacional. Cada <strong>unidad educativa</strong> publica ofertas dentro de la gestión activa.</p>
         </div>
         <a href="{{ route('admin.gestiones.create') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">
             Nueva gestión

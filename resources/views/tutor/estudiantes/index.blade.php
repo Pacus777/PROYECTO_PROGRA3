@@ -12,7 +12,7 @@
         <div>
             <p class="text-xs text-slate-400">Tutor / Mis estudiantes</p>
             <h1 class="text-2xl font-bold text-slate-900">Mis estudiantes</h1>
-            <p class="mt-1 text-sm text-slate-500">Ingresa el código del estudiante para vincularlo a tu cuenta.</p>
+            <p class="mt-1 text-sm text-slate-500">Vincula postulantes con su RUDE o el código de la institución. Ellos no tienen usuario propio.</p>
         </div>
     </div>
 
@@ -36,18 +36,18 @@
 
         {{-- Formulario de vinculación por código --}}
         <div class="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-            <h2 class="mb-1 text-base font-semibold text-slate-800">Vincular estudiante por código</h2>
-            <p class="mb-4 text-xs text-slate-500">El código es el identificador único del estudiante (<code class="rounded bg-slate-100 px-1">codigo_est</code>). Si no lo tienes, consulta con la institución.</p>
+            <h2 class="mb-1 text-base font-semibold text-slate-800">Vincular estudiante</h2>
+            <p class="mb-4 text-xs text-slate-500">Ingresa el <strong>RUDE</strong> del postulante (Registro Único de Estudiantes) o el código que te dio la institución.</p>
 
             <form method="POST" action="{{ route('tutor.estudiantes.store') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 @csrf
                 <div class="flex-1">
-                    <label for="codigo_est" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Código del estudiante</label>
+                    <label for="codigo_est" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">RUDE o código del estudiante</label>
                     <input type="text"
                            name="codigo_est"
                            id="codigo_est"
                            value="{{ old('codigo_est') }}"
-                           placeholder="Ej: EST-2025-001"
+                           placeholder="Ej: 1234567890 (RUDE)"
                            autocomplete="off"
                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
                     @error('codigo_est')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
@@ -77,7 +77,7 @@
                         <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-1a4 4 0 00-5-3.87M9 20H4v-1a4 4 0 015-3.87m0-6.13a4 4 0 110-8 4 4 0 010 8zm8 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     </div>
                     <p class="mt-4 font-semibold text-slate-700">Sin estudiantes vinculados</p>
-                    <p class="mt-2 text-sm text-slate-400">Ingresa el código de un estudiante arriba para vincularlo.</p>
+                    <p class="mt-2 text-sm text-slate-400">Ingresa el RUDE o código de un estudiante arriba para vincularlo.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
@@ -85,6 +85,7 @@
                         <thead class="border-b border-slate-100 bg-slate-50">
                             <tr>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Nombre</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">RUDE</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Código</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">CI</th>
                                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">Acciones</th>
@@ -98,6 +99,13 @@
                                 @endphp
                                 <tr class="transition hover:bg-teal-50/30">
                                     <td class="px-6 py-4 font-medium text-slate-900">{{ $nombre ?: '—' }}</td>
+                                    <td class="px-6 py-4">
+                                        @if($est->rude_est)
+                                            <code class="rounded bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800">{{ $est->rude_est }}</code>
+                                        @else
+                                            <span class="text-slate-400">—</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4">
                                         @if($est->codigo_est)
                                             <code class="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{{ $est->codigo_est }}</code>

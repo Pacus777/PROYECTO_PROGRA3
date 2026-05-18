@@ -25,7 +25,7 @@
             <h3 class="text-white font-semibold mb-4">Acceso</h3>
             <ul class="space-y-3 text-slate-400">
                 <li><a href="{{ route('login.show') }}" class="hover:text-blue-400 transition-colors">Iniciar sesión</a></li>
-                <li><a href="{{ route('login.show') }}" class="hover:text-blue-400 transition-colors">Registrarse</a></li>
+                <li><a href="{{ route('login.show') }}" class="hover:text-blue-400 transition-colors">Acceso tutor / apoderado</a></li>
                 <li><a href="{{ route('login.show') }}" class="hover:text-blue-400 transition-colors">Portal de Tutores</a></li>
                 <li><a href="{{ route('login.show') }}" class="hover:text-blue-400 transition-colors">Panel Administrativo</a></li>
             </ul>

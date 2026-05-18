@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Estudiante;
 use App\Models\Persona;
 use App\Repositories\EstudianteRepository;
+use App\Support\EstudianteIdentificador;
 use Illuminate\Support\Facades\DB;
 
 class EstudianteService
@@ -37,9 +38,16 @@ class EstudianteService
                 'telefono_per' => $data['telefono_per'] ?? null,
             ]);
 
+            $rude = EstudianteIdentificador::normalizarRude($data['rude_est'] ?? null);
+            $codigo = isset($data['codigo_est']) && trim((string) $data['codigo_est']) !== ''
+                ? trim((string) $data['codigo_est'])
+                : $rude;
+
             return $this->repository->create([
                 'id_per_est' => $persona->id_per,
-                'codigo_est' => $data['codigo_est'] ?? null,
+                'codigo_est' => $codigo,
+                'rude_est' => $rude,
+                'id_ued_mat_est' => $data['id_ued_mat_est'] ?? null,
             ]);
         });
     }
@@ -62,12 +70,26 @@ class EstudianteService
                 $estudiante->persona?->update($personaAttrs);
             }
 
+            $attrs = [];
+            if (array_key_exists('rude_est', $data)) {
+                $attrs['rude_est'] = EstudianteIdentificador::normalizarRude($data['rude_est']);
+            }
             if (array_key_exists('codigo_est', $data)) {
-                $estudiante->update(['codigo_est' => $data['codigo_est']]);
+                $attrs['codigo_est'] = trim((string) $data['codigo_est']) !== ''
+                    ? trim((string) $data['codigo_est'])
+                    : null;
+            }
+            if (array_key_exists('id_ued_mat_est', $data)) {
+                $attrs['id_ued_mat_est'] = $data['id_ued_mat_est'] !== '' && $data['id_ued_mat_est'] !== null
+                    ? (int) $data['id_ued_mat_est']
+                    : null;
+            }
+            if ($attrs !== []) {
+                $estudiante->update($attrs);
             }
         });
 
-        return $estudiante->fresh('persona');
+        return $estudiante->fresh(['persona', 'unidadMatriculaActual']);
     }
 
     public function delete(Estudiante $estudiante): void

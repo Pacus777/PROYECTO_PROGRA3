@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\Estudiante;
 
 use App\Models\Estudiante;
+use App\Support\EstudianteIdentificador;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,6 +23,12 @@ class UpdateEstudianteRequest extends FormRequest
         $estudiante = $this->route('estudiante');
 
         return [
+            'rude_est' => [
+                'nullable',
+                'string',
+                'regex:'.EstudianteIdentificador::RUDE_REGEX,
+                Rule::unique('estudiante', 'rude_est')->ignore($estudiante?->id_est, 'id_est'),
+            ],
             'codigo_est' => [
                 'nullable',
                 'string',

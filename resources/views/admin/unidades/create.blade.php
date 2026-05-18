@@ -13,33 +13,49 @@
     <div class="mb-8">
         <p class="text-xs text-slate-400">Panel / Unidades educativas</p>
         <h1 class="mt-1 text-2xl font-bold text-slate-900">Nueva unidad educativa</h1>
+        <p class="mt-1 text-sm text-slate-500">Registro del colegio en el catálogo central.</p>
     </div>
 
-    <form method="POST" action="{{ route('admin.unidades.store') }}" class="max-w-2xl rounded-2xl bg-white p-6 shadow-sm md:p-8">
-        @csrf
-        <div class="space-y-5">
-            <div>
-                <label for="nombre_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Nombre</label>
-                <input type="text" name="nombre_ued" id="nombre_ued" value="{{ old('nombre_ued') }}" required
-                       class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                @error('nombre_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label for="codigo_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Código (único, opcional)</label>
-                <input type="text" name="codigo_ued" id="codigo_ued" value="{{ old('codigo_ued') }}"
-                       class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                @error('codigo_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label for="direccion_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Dirección</label>
-                <textarea name="direccion_ued" id="direccion_ued" rows="3"
-                          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">{{ old('direccion_ued') }}</textarea>
-                @error('direccion_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            </div>
-        </div>
-        <div class="mt-8 flex flex-wrap gap-3">
-            <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">Guardar</button>
-            <a href="{{ route('admin.unidades.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancelar</a>
-        </div>
-    </form>
+    <div class="rounded-2xl bg-white p-6 shadow-sm md:p-8">
+        <x-ui.form-wizard
+            :steps="['Datos del colegio', 'Ubicación']"
+            :action="route('admin.unidades.store')"
+            submit-label="Guardar unidad"
+            :cancel-url="route('admin.unidades.index')"
+        >
+            <x-ui.form-wizard-step :index="0" title="Identificación">
+                <div class="space-y-5">
+                    <div>
+                        <label for="nombre_ued" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Nombre</label>
+                        <input type="text" name="nombre_ued" id="nombre_ued" value="{{ old('nombre_ued') }}" required
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        @error('nombre_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="codigo_ued" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Código UE</label>
+                        <p class="mb-1.5 text-xs text-slate-500">Identifica al colegio (no al RUDE del estudiante).</p>
+                        <input type="text" name="codigo_ued" id="codigo_ued" value="{{ old('codigo_ued') }}"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        @error('codigo_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+            </x-ui.form-wizard-step>
+
+            <x-ui.form-wizard-step :index="1" title="Territorio y dirección">
+                <div class="space-y-5">
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 p-4">
+                        <p class="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Ubicación territorial</p>
+                        <x-admin.filtro-territorio :departamentos="$departamentos" mode="form" :show-unidad="false" />
+                        @error('id_mun_ued')<p class="mt-2 text-xs text-rose-600">{{ $message }}</p>@enderror
+                        @error('id_dis_ued')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                    </div>
+                    <x-admin.address-location-picker
+                        :address="old('direccion_ued')"
+                        :lat="old('lat_ued')"
+                        :lng="old('lng_ued')"
+                    />
+                </div>
+            </x-ui.form-wizard-step>
+        </x-ui.form-wizard>
+    </div>
 @endsection

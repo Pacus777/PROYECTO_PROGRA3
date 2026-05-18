@@ -22,13 +22,23 @@ class TutorVinculoController extends Controller
     {
         $perPage = max(5, min(50, (int) $request->query('per_page', 15)));
 
+        $search = $request->query('q');
+
         $tutores = Tutor::query()
             ->with('persona')
             ->withCount('estudiantes')
+            ->when($search, function ($q) use ($search): void {
+                $q->whereHas('persona', function ($p) use ($search): void {
+                    $p->where('nombres_per', 'like', "%{$search}%")
+                        ->orWhere('ap_paterno_per', 'like', "%{$search}%")
+                        ->orWhere('ci_per', 'like', "%{$search}%");
+                });
+            })
             ->orderByDesc('id_tut')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
 
-        return view('admin.tutores.index', compact('tutores'));
+        return view('admin.tutores.index', compact('tutores', 'search'));
     }
 
     public function index(Tutor $tutor): View

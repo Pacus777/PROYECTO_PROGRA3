@@ -10,6 +10,8 @@ class UnidadEducativaRepository
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return UnidadEducativa::query()
+            ->with(['municipio.provincia.departamento', 'distritoEducativo'])
+            ->withCount(['estudiantesMatriculados', 'ofertasAcademicas', 'usuarios'])
             ->orderBy('nombre_ued')
             ->paginate($perPage);
     }

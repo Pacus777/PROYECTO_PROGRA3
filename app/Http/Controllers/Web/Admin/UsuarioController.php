@@ -28,13 +28,16 @@ class UsuarioController extends Controller
         $perPage = max(5, min(50, (int) $request->query('per_page', 15)));
 
         $usuarios = $this->usuarioService->listPaginated($perPage);
+        $roles = Rol::query()->whereIn('nombre_rol', Roles::assignable())->orderBy('nombre_rol')->get();
+        $unidades = UnidadEducativa::query()->orderBy('nombre_ued')->get();
+        $openUsuarioModal = session()->has('errors') && old('_modal') === 'usuario-create';
 
-        return view('admin.usuarios.index', compact('usuarios'));
+        return view('admin.usuarios.index', compact('usuarios', 'roles', 'unidades', 'openUsuarioModal'));
     }
 
     public function create(): View
     {
-        $roles = Rol::query()->orderBy('nombre_rol')->get();
+        $roles = Rol::query()->whereIn('nombre_rol', Roles::assignable())->orderBy('nombre_rol')->get();
         $unidades = UnidadEducativa::query()->orderBy('nombre_ued')->get();
 
         return view('admin.usuarios.create', compact('roles', 'unidades'));
@@ -65,7 +68,7 @@ class UsuarioController extends Controller
     public function edit(Usuario $usuario): View
     {
         $usuario->load(['persona', 'rol', 'unidadEducativa']);
-        $roles = Rol::query()->orderBy('nombre_rol')->get();
+        $roles = Rol::query()->whereIn('nombre_rol', Roles::assignable())->orderBy('nombre_rol')->get();
         $unidades = UnidadEducativa::query()->orderBy('nombre_ued')->get();
 
         return view('admin.usuarios.edit', compact('usuario', 'roles', 'unidades'));

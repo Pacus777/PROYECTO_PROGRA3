@@ -6,6 +6,7 @@ namespace App\Http\Requests\Web\Admin\Usuario;
 
 use App\Support\Roles;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUsuarioRequest extends FormRequest
 {
@@ -27,7 +28,11 @@ class StoreUsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_rol_usu' => ['required', 'integer', 'exists:rol,id_rol'],
+            'id_rol_usu' => [
+                'required',
+                'integer',
+                Rule::exists('rol', 'id_rol')->where(fn ($query) => $query->whereIn('nombre_rol', Roles::assignable())),
+            ],
             'id_ued_usu' => ['nullable', 'integer', 'exists:unidad_educativa,id_ued'],
             'correo_usu' => ['required', 'string', 'email', 'max:160', 'unique:usuario,correo_usu'],
             'password_usu' => ['required', 'string', 'min:8'],
@@ -51,7 +56,7 @@ class StoreUsuarioRequest extends FormRequest
             $rol = \App\Models\Rol::query()->find($rolId);
 
             if ($rol && $rol->nombre_rol === Roles::ADMIN_INSTITUCIONAL && empty($uedId)) {
-                $validator->errors()->add('id_ued_usu', 'El administrador institucional debe tener unidad educativa asignada.');
+                $validator->errors()->add('id_ued_usu', 'La cuenta de unidad educativa (director / secretaría) debe tener un colegio asignado.');
             }
         });
     }

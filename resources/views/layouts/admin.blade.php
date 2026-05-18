@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Administración | AdmisiónEscolar')</title>
+    @include('partials.favicon')
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
@@ -16,7 +17,7 @@
                     <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white text-sm">AE</span>
                     AdmisiónEscolar
                 </a>
-                <p class="mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">@yield('admin_label', 'Admin general')</p>
+                <p class="mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">@yield('admin_label', 'Ministerio de Educación')</p>
             </div>
             <nav class="flex-1 p-4 space-y-1">
                 @hasSection('admin_sidebar')
@@ -36,7 +37,7 @@
             <div class="p-4 border-t border-slate-100 text-xs text-slate-500">
                 @if($layoutWebUsuario)
                     <p class="font-medium text-slate-800 truncate">{{ trim(($layoutWebUsuario->persona->nombres_per ?? '').' '.($layoutWebUsuario->persona->ap_paterno_per ?? '')) ?: $layoutWebUsuario->correo_usu }}</p>
-                    <p class="truncate mt-0.5">{{ $layoutWebUsuario->rol->nombre_rol ?? '' }}</p>
+                    <p class="truncate mt-0.5">{{ \App\Support\Roles::label($layoutWebUsuario->rol->nombre_rol ?? null) }}</p>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf

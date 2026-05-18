@@ -9,7 +9,7 @@
         <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @php
                 $cards = [
-                    ['t'=>'Registro Simple','d'=>'Completa el formulario en minutos desde cualquier dispositivo, sin papeles ni filas.','c'=>'text-blue-500','icon'=>'clipboard'],
+                    ['t'=>'Cuenta de tutor','d'=>'El apoderado crea su usuario y vincula a sus hijos con el RUDE para postular, subir documentos y hacer seguimiento.','c'=>'text-blue-500','icon'=>'clipboard'],
                     ['t'=>'Seguimiento en Tiempo Real','d'=>'Revisa el estado de tu postulación en cualquier momento con notificaciones automáticas.','c'=>'text-cyan-500','icon'=>'refresh'],
                     ['t'=>'Proceso Transparente','d'=>'Criterios de evaluación claros y resultados publicados con total imparcialidad.','c'=>'text-blue-700','icon'=>'shield'],
                     ['t'=>'Asignación Rápida','d'=>'Sistema automatizado que agiliza la evaluación y asignación de cupos escolares.','c'=>'text-cyan-600','icon'=>'rocket'],

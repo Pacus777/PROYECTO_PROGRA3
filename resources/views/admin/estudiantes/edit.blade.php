@@ -18,28 +18,29 @@
         <p class="mt-1 text-sm text-slate-500">
             {{ trim(($p->nombres_per ?? '').' '.($p->ap_paterno_per ?? '')) }}
         </p>
+        <p class="mt-2 text-xs text-slate-500">Registro académico; el postulante no tiene cuenta de acceso.</p>
     </div>
+
+    <x-alert-sin-cuenta-estudiante />
+
+    @if(session('success'))
+        <div class="mb-6 max-w-2xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 max-w-2xl rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{{ session('error') }}</div>
+    @endif
 
     <form method="POST" action="{{ route('admin.estudiantes.update', $estudiante) }}"
           class="max-w-2xl rounded-2xl bg-white p-6 shadow-sm md:p-8">
         @csrf
         @method('PUT')
 
-        {{-- Código (destacado) --}}
-        <div class="mb-6 rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4">
-            <label for="codigo_est" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-indigo-700">
-                Código del estudiante
-                <span class="ml-1 font-normal text-indigo-500">(el tutor usa este código para vincularse)</span>
-            </label>
-            <input type="text" name="codigo_est" id="codigo_est"
-                   value="{{ old('codigo_est', $estudiante->codigo_est) }}"
-                   placeholder="Ej: EST-2025-001"
-                   class="w-full rounded-xl border border-indigo-200 bg-white px-4 py-3 text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-            @error('codigo_est')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
-            @if(!$estudiante->codigo_est)
-                <p class="mt-2 text-xs text-amber-700 font-medium">⚠ Sin código asignado — el tutor no puede vincularse hasta que asignes uno.</p>
-            @endif
-        </div>
+        @include('admin.estudiantes._identificadores', ['estudiante' => $estudiante])
+        @if(!$estudiante->rude_est && !$estudiante->codigo_est)
+            <p class="-mt-4 mb-6 text-xs font-medium text-amber-700">Sin RUDE ni código: el tutor no podrá vincular a este estudiante.</p>
+        @endif
+
+        @include('admin.estudiantes._matricula_ue', ['estudiante' => $estudiante, 'unidades' => $unidades])
 
         <div class="space-y-4">
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -113,4 +114,15 @@
             </a>
         </div>
     </form>
+
+    @include('admin.estudiantes._tutores', [
+        'estudiante' => $estudiante,
+        'tutoresVinculados' => $tutoresVinculados,
+        'tutoresDisponibles' => $tutoresDisponibles,
+    ])
+
+    @include('admin.estudiantes._trayectoria_ue', [
+        'estudiante' => $estudiante,
+        'trayectoriaPostulaciones' => $trayectoriaPostulaciones,
+    ])
 @endsection

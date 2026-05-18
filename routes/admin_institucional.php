@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\AdminInstitucional\DocumentoController;
 use App\Http\Controllers\Web\AdminInstitucional\EvaluacionController;
 use App\Http\Controllers\Web\AdminInstitucional\OfertaController;
 use App\Http\Controllers\Web\AdminInstitucional\PostulacionController;
+use App\Http\Controllers\Web\AdminInstitucional\ReporteController as InstitucionalReporteController;
 use App\Http\Controllers\Web\AdminInstitucional\ResultadoController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,7 +36,12 @@ Route::resource('cupos', CupoController::class)
     ->names(['store' => 'cupos.store', 'update' => 'cupos.update']);
 
 Route::get('/postulaciones', [PostulacionController::class, 'index'])->name('postulaciones.index');
+Route::get('/postulaciones/export', [InstitucionalReporteController::class, 'exportPostulaciones'])->name('postulaciones.export');
 Route::get('/postulaciones/{postulacion}', [PostulacionController::class, 'show'])->name('postulaciones.show');
+
+Route::get('/ofertas/export', [InstitucionalReporteController::class, 'exportOfertas'])->name('ofertas.export');
+Route::get('/resultados/export', [InstitucionalReporteController::class, 'exportResultados'])->name('resultados.export');
+Route::get('/documentos/export', [InstitucionalReporteController::class, 'exportDocumentos'])->name('documentos.export');
 
 Route::resource('criterios', EvaluacionController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::post('/postulaciones/{postulacion}/evaluaciones', [EvaluacionController::class, 'storeEvaluacion'])->name('evaluaciones.store');
