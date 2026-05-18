@@ -45,7 +45,14 @@ class DocumentoController extends BaseInstitutionalController
 
         $this->assertDocumentoBelongsToUnidad($documento, $this->unidadId($request));
 
+        $estadoAnterior = $documento->estado_doc;
         $this->service->updateEstado($documento, $request->input('estado_doc'));
+        $documento->refresh()->load('tipoDocumento', 'postulacion.estudiante.persona');
+
+        $this->registrarActividad($request, 'documento', (int) $documento->id_doc, 'documento_estado', [
+            'descripcion' => 'Documento '.($documento->tipoDocumento->nombre_tdo ?? '—').': '.$estadoAnterior.' → '.$documento->estado_doc,
+            'url' => route('admin.institucional.documentos.index'),
+        ]);
 
         return back()->with('success', 'Estado actualizado.');
     }

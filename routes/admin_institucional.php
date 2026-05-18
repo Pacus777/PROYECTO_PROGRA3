@@ -8,6 +8,8 @@ use App\Http\Controllers\Web\AdminInstitucional\CupoController;
 use App\Http\Controllers\Web\AdminInstitucional\DashboardController;
 use App\Http\Controllers\Web\AdminInstitucional\DocumentoController;
 use App\Http\Controllers\Web\AdminInstitucional\EvaluacionController;
+use App\Http\Controllers\Web\AdminInstitucional\HistorialController;
+use App\Http\Controllers\Web\AdminInstitucional\ListaEsperaController;
 use App\Http\Controllers\Web\AdminInstitucional\OfertaController;
 use App\Http\Controllers\Web\AdminInstitucional\PostulacionController;
 use App\Http\Controllers\Web\AdminInstitucional\ReporteController as InstitucionalReporteController;
@@ -38,9 +40,24 @@ Route::resource('cupos', CupoController::class)
 Route::get('/postulaciones', [PostulacionController::class, 'index'])->name('postulaciones.index');
 Route::get('/postulaciones/export', [InstitucionalReporteController::class, 'exportPostulaciones'])->name('postulaciones.export');
 Route::get('/postulaciones/{postulacion}', [PostulacionController::class, 'show'])->name('postulaciones.show');
+Route::patch('/postulaciones/{postulacion}', [PostulacionController::class, 'update'])->name('postulaciones.update');
+
+Route::get('/reportes', [InstitucionalReporteController::class, 'index'])->name('reportes.index');
+Route::prefix('reportes/export')->name('reportes.export.')->group(function (): void {
+    Route::get('/postulaciones', [InstitucionalReporteController::class, 'exportPostulaciones'])->name('postulaciones');
+    Route::get('/ofertas', [InstitucionalReporteController::class, 'exportOfertas'])->name('ofertas');
+    Route::get('/resultados', [InstitucionalReporteController::class, 'exportResultados'])->name('resultados');
+    Route::get('/asignaciones', [InstitucionalReporteController::class, 'exportAsignaciones'])->name('asignaciones');
+    Route::get('/lista-espera', [InstitucionalReporteController::class, 'exportListaEspera'])->name('lista-espera');
+    Route::get('/historial', [InstitucionalReporteController::class, 'exportHistorial'])->name('historial');
+    Route::get('/documentos', [InstitucionalReporteController::class, 'exportDocumentos'])->name('documentos');
+    Route::get('/resumen-admision', [InstitucionalReporteController::class, 'exportResumenAdmision'])->name('resumen-admision');
+});
 
 Route::get('/ofertas/export', [InstitucionalReporteController::class, 'exportOfertas'])->name('ofertas.export');
 Route::get('/resultados/export', [InstitucionalReporteController::class, 'exportResultados'])->name('resultados.export');
+Route::get('/lista-espera/export', [InstitucionalReporteController::class, 'exportListaEspera'])->name('lista-espera.export');
+Route::get('/historial/export', [InstitucionalReporteController::class, 'exportHistorial'])->name('historial.export');
 Route::get('/documentos/export', [InstitucionalReporteController::class, 'exportDocumentos'])->name('documentos.export');
 
 Route::resource('criterios', EvaluacionController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -49,7 +66,14 @@ Route::put('/evaluaciones/{evaluacion}', [EvaluacionController::class, 'updateEv
 Route::delete('/evaluaciones/{evaluacion}', [EvaluacionController::class, 'destroyEvaluacion'])->name('evaluaciones.destroy');
 
 Route::get('/resultados', [ResultadoController::class, 'index'])->name('resultados.index');
+Route::post('/resultados/sincronizar', [ResultadoController::class, 'sincronizar'])->name('resultados.sincronizar');
+Route::get('/asignacion', [AsignacionController::class, 'index'])->name('asignacion.index');
 Route::post('/asignacion/ejecutar', [AsignacionController::class, 'store'])->name('asignacion.store');
+
+Route::get('/lista-espera', [ListaEsperaController::class, 'index'])->name('lista-espera.index');
+Route::post('/lista-espera/{lista_espera}/asignar-cupo', [ListaEsperaController::class, 'asignarCupo'])->name('lista-espera.asignar-cupo');
+
+Route::get('/historial', [HistorialController::class, 'index'])->name('historial.index');
 
 Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
 Route::patch('/documentos/{documento}/estado', [DocumentoController::class, 'updateEstado'])->name('documentos.estado');

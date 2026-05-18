@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\OfertaAcademica;
 use App\Models\Postulacion;
 use App\Models\Usuario;
+use App\Services\HistorialInstitucionalService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -48,6 +49,19 @@ abstract class BaseInstitutionalController extends Controller
         if ($ofertaUnidadId !== $unidadId) {
             throw new HttpException(403, 'Postulación fuera de tu unidad educativa.');
         }
+    }
+
+    protected function registrarActividad(Request $request, string $tabla, int $idRegistro, string $accion, array $datos = []): void
+    {
+        $usuarioId = (int) $request->session()->get('web_usuario_id');
+
+        app(HistorialInstitucionalService::class)->registrar(
+            $usuarioId > 0 ? $usuarioId : null,
+            $tabla,
+            $idRegistro,
+            $accion,
+            $datos,
+        );
     }
 }
 

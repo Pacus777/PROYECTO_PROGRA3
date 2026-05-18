@@ -52,7 +52,7 @@ class EvaluacionController extends BaseInstitutionalController
         $postulacion->loadMissing('ofertaAcademica');
         $this->assertPostulacionBelongsToUnidad($postulacion, $unidadId);
 
-        Evaluacion::query()->updateOrCreate(
+        $evaluacion = Evaluacion::query()->updateOrCreate(
             [
                 'id_pos_eva' => $postulacion->id_pos,
                 'id_cri_eva' => (int) $request->validated('id_cri_eva'),
@@ -62,6 +62,11 @@ class EvaluacionController extends BaseInstitutionalController
                 'observaciones_eva' => $request->validated('observaciones_eva'),
             ],
         );
+
+        $this->registrarActividad($request, 'evaluacion', (int) $evaluacion->id_eva, 'evaluacion', [
+            'descripcion' => 'Puntuación registrada: '.number_format((float) $evaluacion->puntaje_eva, 2),
+            'url' => route('admin.institucional.postulaciones.show', $postulacion),
+        ]);
 
         return back()->with('success', 'Evaluación guardada.');
     }

@@ -4,93 +4,60 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web\AdminInstitucional;
 
-use App\Models\Asignacion;
-use App\Models\EstadoPostulacion;
-use App\Models\ListaEspera;
-use App\Models\OfertaAcademica;
-use App\Models\Postulacion;
-use App\Models\Resultado;
+use App\Services\ResultadoInstitucionalService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AsignacionController extends BaseInstitutionalController
 {
+    public function __construct(
+        private readonly ResultadoInstitucionalService $service,
+    ) {}
+
+    public function index(Request $request): View
+    {
+        $unidadId = $this->unidadId($request);
+        $usuario = $this->webUsuario($request)->load('unidadEducativa');
+
+        return view('admin.institucional.asignacion.index', [
+            'unidad' => $usuario->unidadEducativa,
+            'resumen' => $this->service->resumen($unidadId),
+            'asignaciones' => $this->service->queryAsignacionesUnidad($unidadId, $request)->paginate(20)->withQueryString(),
+            'ofertasUnidad' => $this->service->ofertasParaFiltro($unidadId),
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $unidadId = $this->unidadId($request);
 
-        $aprobadoEstadoId = (int) EstadoPostulacion::query()
-            ->whereRaw('LOWER(nombre_ept) = ?', ['aprobado'])
-            ->value('id_ept');
+        $resumen = $this->service->resumen($unidadId);
+        if ($resumen['ofertas_con_cupo'] === 0) {
+            return back()->with('error', 'No hay ofertas con cupos definidos. Configure cupos en Ofertas académicas primero.');
+        }
 
-        DB::transaction(function () use ($unidadId, $aprobadoEstadoId): void {
-            $ofertas = OfertaAcademica::query()
-                ->with('cupos')
-                ->where('id_ued_oac', $unidadId)
-                ->get();
+        if ($resumen['con_evaluacion'] === 0) {
+            return back()->with('error', 'No hay evaluaciones registradas. Puntúe postulantes en Postulaciones o Criterios antes de asignar.');
+        }
 
-            foreach ($ofertas as $oferta) {
-                $cupo = $oferta->cupos()->first();
-                if (! $cupo) {
-                    continue;
-                }
+        $stats = $this->service->ejecutarAsignacion($unidadId);
 
-                $ranking = Postulacion::query()
-                    ->select('postulacion.*')
-                    ->selectRaw('COALESCE(SUM(evaluacion.puntaje_eva * COALESCE(criterio.peso_cri, 1)), 0) as puntaje_total')
-                    ->leftJoin('evaluacion', 'evaluacion.id_pos_eva', '=', 'postulacion.id_pos')
-                    ->leftJoin('criterio', 'criterio.id_cri', '=', 'evaluacion.id_cri_eva')
-                    ->where('postulacion.id_oac_pos', $oferta->id_oac)
-                    ->groupBy('postulacion.id_pos')
-                    ->orderByDesc('puntaje_total')
-                    ->orderBy('postulacion.id_pos')
-                    ->get();
+        if ($stats['ofertas_procesadas'] === 0) {
+            return back()->with('error', 'Ninguna oferta tenía cupos configurados para procesar.');
+        }
 
-                Asignacion::query()->whereIn('id_pos_asi', $ranking->pluck('id_pos')->all())->delete();
-                ListaEspera::query()->where('id_oac_les', $oferta->id_oac)->delete();
+        $this->registrarActividad($request, 'asignacion', $unidadId, 'asignacion_masiva', [
+            'descripcion' => "Asignación masiva: {$stats['asignados']} cupo(s) asignados, {$stats['lista_espera']} en lista de espera.",
+            'url' => route('admin.institucional.asignacion.index'),
+        ]);
 
-                $disponibles = (int) $cupo->disponibles_cup;
-                $ordenEspera = 1;
-
-                foreach ($ranking as $index => $postulacion) {
-                    $puntaje = (float) $postulacion->puntaje_total;
-                    Resultado::query()->updateOrCreate(
-                        ['id_pos_res' => $postulacion->id_pos],
-                        [
-                            'puntaje_total_res' => $puntaje,
-                            'clasificacion_res' => $index + 1,
-                        ],
-                    );
-
-                    if ($disponibles > 0) {
-                        Asignacion::query()->create([
-                            'id_pos_asi' => $postulacion->id_pos,
-                            'id_cup_asi' => $cupo->id_cup,
-                            'estado_asi' => 'asignado',
-                            'fecha_asi' => now(),
-                        ]);
-                        $disponibles--;
-
-                        if ($aprobadoEstadoId > 0) {
-                            Postulacion::query()
-                                ->where('id_pos', $postulacion->id_pos)
-                                ->update(['id_ept_pos' => $aprobadoEstadoId]);
-                        }
-                    } else {
-                        ListaEspera::query()->create([
-                            'id_pos_les' => $postulacion->id_pos,
-                            'id_oac_les' => $oferta->id_oac,
-                            'orden_les' => $ordenEspera++,
-                        ]);
-                    }
-                }
-
-                $cupo->update(['disponibles_cup' => $disponibles]);
-            }
-        });
-
-        return back()->with('success', 'Asignación ejecutada correctamente. Se actualizó ranking, cupos y lista de espera.');
+        return redirect()
+            ->route('admin.institucional.asignacion.index')
+            ->with(
+                'success',
+                "Asignación completada: {$stats['ofertas_procesadas']} oferta(s), "
+                ."{$stats['asignados']} cupo(s) asignados, {$stats['lista_espera']} en lista de espera.",
+            );
     }
 }
-

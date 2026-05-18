@@ -41,18 +41,6 @@ class UpdateOfertaAcademicaRequest extends FormRequest
                 $validator->errors()->add('id_par_oac', 'El paralelo no pertenece al curso seleccionado.');
             }
 
-            if (
-                \App\Models\OfertaAcademica::query()
-                    ->where('id_ges_oac', $this->input('id_ges_oac'))
-                    ->where('id_ued_oac', $oferta?->id_ued_oac)
-                    ->where('id_niv_oac', $this->input('id_niv_oac'))
-                    ->where('id_cur_oac', $this->input('id_cur_oac'))
-                    ->where('id_par_oac', $this->input('id_par_oac'))
-                    ->where('id_oac', '!=', $oferta?->id_oac)
-                    ->exists()
-            ) {
-                $validator->errors()->add('id_par_oac', 'Ya existe esta oferta para la gestión y unidad.');
-            }
         });
     }
 }

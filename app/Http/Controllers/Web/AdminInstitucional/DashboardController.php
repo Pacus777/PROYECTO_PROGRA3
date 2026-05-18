@@ -4,51 +4,27 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web\AdminInstitucional;
 
-use App\Models\Cupo;
-use App\Models\EstadoPostulacion;
-use App\Models\OfertaAcademica;
 use App\Models\Postulacion;
-use App\Models\Resultado;
+use App\Services\InstitucionalDashboardChartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class DashboardController extends BaseInstitutionalController
 {
+    public function __construct(
+        private readonly InstitucionalDashboardChartService $dashboardCharts,
+    ) {}
+
     public function __invoke(Request $request): View
     {
         $unidadId = $this->unidadId($request);
+        $institucionalDashboard = $this->dashboardCharts->build($unidadId);
 
-        $postBase = Postulacion::query()
-            ->whereHas('ofertaAcademica', fn ($q) => $q->where('id_ued_oac', $unidadId));
+        $porEstado = $this->mapPorEstado($institucionalDashboard['charts']['postulaciones_estado'] ?? []);
 
-        $totalPostulaciones = (clone $postBase)->count();
-
-        $cuposDisponibles = Cupo::query()
+        $recientes = Postulacion::query()
             ->whereHas('ofertaAcademica', fn ($q) => $q->where('id_ued_oac', $unidadId))
-            ->sum('disponibles_cup');
-
-        $aprobados = Resultado::query()
-            ->whereHas('postulacion.ofertaAcademica', fn ($q) => $q->where('id_ued_oac', $unidadId))
-            ->where('clasificacion_res', 'like', '%aprobad%')
-            ->count();
-
-        $countsByEstadoId = (clone $postBase)
-            ->selectRaw('id_ept_pos, COUNT(*) as total')
-            ->groupBy('id_ept_pos')
-            ->pluck('total', 'id_ept_pos');
-
-        $estadoNombres = EstadoPostulacion::query()
-            ->whereIn('id_ept', $countsByEstadoId->keys())
-            ->pluck('nombre_ept', 'id_ept');
-
-        $porEstado = $countsByEstadoId->map(function (int|string $total, int|string $idEpt) use ($estadoNombres): array {
-            return [
-                'nombre' => (string) ($estadoNombres[(int) $idEpt] ?? '—'),
-                'total' => (int) $total,
-            ];
-        })->values()->sortByDesc('total')->values();
-
-        $recientes = (clone $postBase)
             ->with([
                 'estadoPostulacion',
                 'estudiante.persona',
@@ -59,14 +35,40 @@ class DashboardController extends BaseInstitutionalController
             ->limit(6)
             ->get();
 
+        $kpis = $institucionalDashboard['kpis'];
+
         $stats = [
-            'ofertas'        => OfertaAcademica::query()->where('id_ued_oac', $unidadId)->count(),
-            'postulaciones'  => $totalPostulaciones,
-            'cupos'          => (int) $cuposDisponibles,
-            'aprobados'      => $aprobados,
+            'ofertas' => $kpis['ofertas'],
+            'postulaciones' => $kpis['postulaciones'],
+            'cupos' => $kpis['cupos_disponibles'],
+            'aprobados' => $kpis['cupos_asignados'],
         ];
 
-        return view('admin.institucional.dashboard', compact('stats', 'porEstado', 'recientes'));
+        return view('admin.institucional.dashboard', compact(
+            'stats',
+            'porEstado',
+            'recientes',
+            'institucionalDashboard',
+        ));
+    }
+
+    /**
+     * @param array{labels?: list<string>, data?: list<int>} $chart
+     *
+     * @return Collection<int, array{nombre: string, total: int}>
+     */
+    private function mapPorEstado(array $chart): Collection
+    {
+        $labels = $chart['labels'] ?? [];
+        $data = $chart['data'] ?? [];
+
+        return collect($labels)
+            ->zip($data)
+            ->map(fn ($pair): array => [
+                'nombre' => (string) ($pair[0] ?? '—'),
+                'total' => (int) ($pair[1] ?? 0),
+            ])
+            ->sortByDesc('total')
+            ->values();
     }
 }
-

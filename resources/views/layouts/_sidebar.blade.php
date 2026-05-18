@@ -163,9 +163,13 @@
                 <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/></svg>
                 <span x-show="sidebarOpen" x-transition>Resultados</span>
             </a>
-            <a href="{{ route('admin.institucional.resultados.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.asignacion.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+            <a href="{{ route('admin.institucional.asignacion.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.asignacion.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
                 <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
                 <span x-show="sidebarOpen" x-transition>Asignación</span>
+            </a>
+            <a href="{{ route('admin.institucional.lista-espera.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.lista-espera.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span x-show="sidebarOpen" x-transition>Lista de espera</span>
             </a>
 
             <a href="{{ route('admin.institucional.documentos.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.documentos.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
@@ -173,22 +177,14 @@
                 <span x-show="sidebarOpen" x-transition>Documentos / OCR</span>
             </a>
 
-            <p class="px-4 pb-2 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400" x-show="sidebarOpen">Próximamente</p>
-            @foreach([['Lista de Espera','clock'],['Historial','archive'],['Reportes','chart']] as $coming)
-                <a href="#" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-indigo-50 hover:text-indigo-700">
-                    @if($coming[1] === 'clock')
-                        <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    @elseif($coming[1] === 'doc')
-                        <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h8l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 3v5h5"/></svg>
-                    @elseif($coming[1] === 'archive')
-                        <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V7zm2-4h12v4H6V3zm4 8h4"/></svg>
-                    @else
-                        <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19h16M7 16V8m5 8V5m5 11v-6"/></svg>
-                    @endif
-                    <span x-show="sidebarOpen" x-transition>{{ $coming[0] }}</span>
-                    <span x-show="sidebarOpen" class="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-600">Pronto</span>
-                </a>
-            @endforeach
+            <a href="{{ route('admin.institucional.historial.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.historial.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V7zm2-4h12v4H6V3zm4 8h4"/></svg>
+                <span x-show="sidebarOpen" x-transition>Historial</span>
+            </a>
+            <a href="{{ route('admin.institucional.reportes.index') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('admin.institucional.reportes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                <svg class="h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19h16M7 16V8m5 8V5m5 11v-6"/></svg>
+                <span x-show="sidebarOpen" x-transition>Reportes</span>
+            </a>
         @else
             <p class="px-4 pb-2 pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400" x-show="sidebarOpen">Principal</p>
             <a href="{{ route('dashboard') }}" class="group mx-3 mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-700' }}">
@@ -216,7 +212,7 @@
                     'En Documentos / OCR validas los archivos que suben los tutores.',
                     'Los resultados y la asignación se publican desde Evaluación y Resultados.',
                 ],
-                'link' => ['label' => 'Ver postulaciones', 'url' => route('admin.institucional.postulaciones.index')],
+                'link' => ['label' => 'Descargar reportes', 'url' => route('admin.institucional.reportes.index')],
             ],
             \App\Support\Roles::TUTOR => [
                 'title' => 'Ayuda — Tutor',

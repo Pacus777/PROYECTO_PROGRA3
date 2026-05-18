@@ -8,93 +8,83 @@
 @endsection
 
 @section('content')
-    <div class="mb-8">
-        <p class="text-xs text-slate-400">Panel / Gestión académica</p>
-        <h1 class="text-2xl font-bold text-slate-900">Gestión académica</h1>
-    </div>
+    @php
+        $inputClass = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100';
+        $selectClass = $inputClass;
+        $pageSubtitle = $unidad
+            ? 'Organice el catálogo de '.$unidad->nombre_ued.($unidad->codigo_ued ? ' ('.$unidad->codigo_ued.')' : '').' para crear ofertas de admisión claras y consistentes.'
+            : 'Defina niveles, cursos y paralelos antes de publicar ofertas.';
+    @endphp
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 class="mb-4 text-lg font-semibold text-slate-800">Niveles</h2>
-            <form method="POST" action="{{ route('admin.institucional.niveles.store') }}" class="mb-4">
-                @csrf
-                <input name="nombre_niv" placeholder="Nuevo nivel" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                <button class="mt-2 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Crear nivel</button>
-            </form>
-            <div class="space-y-2">
-                @foreach($niveles as $nivel)
-                    <form method="POST" action="{{ route('admin.institucional.niveles.update', $nivel) }}" class="flex gap-2">
-                        @csrf @method('PUT')
-                        <input name="nombre_niv" value="{{ $nivel->nombre_niv }}" class="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                        <button class="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Guardar</button>
-                    </form>
-                    <form method="POST" action="{{ route('admin.institucional.niveles.destroy', $nivel) }}" onsubmit="return confirm('¿Eliminar nivel?')">
-                        @csrf @method('DELETE')
-                        <button class="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100">Eliminar</button>
-                    </form>
-                @endforeach
-            </div>
-        </section>
+    <x-institucional.page module="academic" title="Gestión académica" :subtitle="$pageSubtitle">
+        <x-slot:actions>
+            <a href="{{ route('admin.institucional.ofertas.index') }}"
+               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-teal-700 shadow-md transition hover:bg-teal-50">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7L12 3 4 7l8 4 8-4zM4 12l8 4 8-4"/></svg>
+                Ir a ofertas y cupos
+            </a>
+        </x-slot:actions>
 
-        <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 class="mb-4 text-lg font-semibold text-slate-800">Cursos</h2>
-            <form method="POST" action="{{ route('admin.institucional.cursos.store') }}" class="space-y-2 mb-4">
-                @csrf
-                <select name="id_niv_cur" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                    @foreach($niveles as $nivel)<option value="{{ $nivel->id_niv }}">{{ $nivel->nombre_niv }}</option>@endforeach
-                </select>
-                <input name="nombre_cur" placeholder="Nuevo curso" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                <button class="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Crear curso</button>
-            </form>
-            <div class="space-y-2">
-                @foreach($cursos as $curso)
-                    <form method="POST" action="{{ route('admin.institucional.cursos.update', $curso) }}" class="space-y-2 rounded-lg border border-slate-100 p-2">
-                        @csrf @method('PUT')
-                        <select name="id_niv_cur" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                            @foreach($niveles as $nivel)<option value="{{ $nivel->id_niv }}" @selected($curso->id_niv_cur === $nivel->id_niv)>{{ $nivel->nombre_niv }}</option>@endforeach
-                        </select>
-                        <input name="nombre_cur" value="{{ $curso->nombre_cur }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                        <div class="flex justify-between items-center">
-                            <button class="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Guardar</button>
+        <x-slot:kpis>
+            <x-institucional.kpi-grid module="academic" :items="[
+                ['label' => 'Ofertas publicadas', 'value' => $resumen['ofertas_unidad']],
+                ['label' => 'Niveles', 'value' => $resumen['niveles']],
+                ['label' => 'Cursos', 'value' => $resumen['cursos']],
+                ['label' => 'Paralelos', 'value' => $resumen['paralelos']],
+            ]" />
+        </x-slot:kpis>
+
+        <div
+            x-data="{
+                tab: @js(old('nombre_par') || old('id_cur_par') ? 'paralelo' : (old('nombre_cur') || old('id_niv_cur') ? 'curso' : 'nivel')),
+                editNivel: null,
+                editCurso: null,
+                editParalelo: null
+            }"
+            class="pb-10"
+        >
+            @include('admin.institucional.academic._agregar')
+
+            <x-institucional.panel module="academic" title="Estructura del catálogo">
+                <div class="p-5">
+                    <p class="mb-4 text-xs text-slate-500">{{ $resumen['niveles'] }} nivel(es) · {{ $resumen['cursos'] }} curso(s) · {{ $resumen['paralelos'] }} paralelo(s)</p>
+
+                    @if($arbolCatalogo->isEmpty())
+                        <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center">
+                            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                                <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/></svg>
+                            </div>
+                            <p class="mt-4 text-base font-semibold text-slate-700">Comience creando un nivel</p>
+                            <p class="mt-2 text-sm text-slate-500">Use el formulario «Agregar elemento» de arriba para registrar el primer nivel.</p>
                         </div>
-                    </form>
-                    <form method="POST" action="{{ route('admin.institucional.cursos.destroy', $curso) }}" onsubmit="return confirm('¿Eliminar curso?')">
-                        @csrf @method('DELETE')
-                        <button class="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100">Eliminar</button>
-                    </form>
-                @endforeach
-            </div>
-        </section>
+                    @else
+                        @include('admin.institucional.academic._catalogo-cards')
+                    @endif
 
-        <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 class="mb-4 text-lg font-semibold text-slate-800">Paralelos</h2>
-            <form method="POST" action="{{ route('admin.institucional.paralelos.store') }}" class="space-y-2 mb-4">
-                @csrf
-                <select name="id_cur_par" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                    @foreach($cursos as $curso)<option value="{{ $curso->id_cur }}">{{ $curso->nombre_cur }} ({{ $curso->nivel->nombre_niv }})</option>@endforeach
-                </select>
-                <input name="nombre_par" placeholder="Paralelo (A, B...)" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                <button class="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Crear paralelo</button>
-            </form>
-            <div class="space-y-2">
-                @foreach($paralelos as $paralelo)
-                    <form method="POST" action="{{ route('admin.institucional.paralelos.update', $paralelo) }}" class="space-y-2 rounded-lg border border-slate-100 p-2">
-                        @csrf @method('PUT')
-                        <select name="id_cur_par" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                            @foreach($cursos as $curso)<option value="{{ $curso->id_cur }}" @selected($paralelo->id_cur_par === $curso->id_cur)>{{ $curso->nombre_cur }}</option>@endforeach
-                        </select>
-                        <input name="nombre_par" value="{{ $paralelo->nombre_par }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                        <div class="flex justify-between items-center">
-                            <button class="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100">Guardar</button>
+                    @if($arbolOfertas->isNotEmpty())
+                        <div class="mt-10">
+                            <h3 class="mb-4 text-base font-semibold text-slate-900">Combinaciones en ofertas activas</h3>
+                            <div class="space-y-4">
+                                @foreach($arbolOfertas as $gestion => $filas)
+                                    <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                                        <p class="mb-3 text-xs font-bold uppercase tracking-wider text-indigo-600">{{ $gestion }}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($filas as $fila)
+                                                <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm text-slate-700 ring-1 ring-slate-200">
+                                                    <span class="font-medium text-indigo-700">{{ $fila['nivel'] }}</span>
+                                                    <span class="text-slate-300">›</span>
+                                                    <span>{{ $fila['curso'] }}</span>
+                                                    <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-bold text-slate-600">{{ $fila['paralelo'] }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </form>
-                    <form method="POST" action="{{ route('admin.institucional.paralelos.destroy', $paralelo) }}" onsubmit="return confirm('¿Eliminar paralelo?')">
-                        @csrf @method('DELETE')
-                        <button class="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100">Eliminar</button>
-                    </form>
-                @endforeach
-            </div>
-        </section>
-    </div>
+                    @endif
+                </div>
+            </x-institucional.panel>
+        </div>
+    </x-institucional.page>
 @endsection
-

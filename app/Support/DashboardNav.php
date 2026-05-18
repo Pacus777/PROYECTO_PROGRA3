@@ -23,6 +23,10 @@ final class DashboardNav
         'ofertas' => ['label' => 'Ofertas', 'index' => 'admin.institucional.ofertas.index'],
         'documentos' => ['label' => 'Documentos', 'index' => 'admin.institucional.documentos.index'],
         'resultados' => ['label' => 'Resultados', 'index' => 'admin.institucional.resultados.index'],
+        'asignacion' => ['label' => 'Asignación', 'index' => 'admin.institucional.asignacion.index'],
+        'lista-espera' => ['label' => 'Lista de espera', 'index' => 'admin.institucional.lista-espera.index'],
+        'historial' => ['label' => 'Historial', 'index' => 'admin.institucional.historial.index'],
+        'reportes' => ['label' => 'Reportes', 'index' => 'admin.reportes.index'],
         'criterios' => ['label' => 'Evaluación', 'index' => 'admin.institucional.criterios.index'],
         'seguimiento' => ['label' => 'Seguimiento', 'index' => 'tutor.seguimiento.index'],
         'perfil' => ['label' => 'Mi perfil', 'index' => 'tutor.perfil.index'],
@@ -71,6 +75,15 @@ final class DashboardNav
             return $items;
         }
 
+        if (($parts[1] ?? '') === 'institucional' && ($parts[2] ?? '') === 'reportes') {
+            $items[] = ['label' => 'Reportes', 'url' => route('admin.institucional.reportes.index')];
+            if (($parts[3] ?? '') === 'export') {
+                $items[] = ['label' => 'Exportar'];
+            }
+
+            return $items;
+        }
+
         $sectionKey = self::resolveSectionKey($parts, $role);
         if ($sectionKey === null) {
             $items[] = ['label' => self::humanize(end($parts) ?: 'Página')];
@@ -87,8 +100,9 @@ final class DashboardNav
             return $items;
         }
 
-        if (isset($section['index']) && Route::has($section['index'])) {
-            $items[] = ['label' => $section['label'], 'url' => route($section['index'])];
+        $indexRoute = $section['index'] ?? null;
+        if ($indexRoute !== null && Route::has($indexRoute)) {
+            $items[] = ['label' => $section['label'], 'url' => route($indexRoute)];
         } else {
             $items[] = ['label' => $section['label']];
         }
@@ -151,6 +165,7 @@ final class DashboardNav
             Roles::ADMIN_INSTITUCIONAL => [
                 ['label' => 'Panel institucional', 'url' => route('admin.institucional.dashboard')],
                 ['label' => 'Académico', 'url' => route('admin.institucional.academic.index')],
+                ['label' => 'Reportes', 'url' => route('admin.institucional.reportes.index')],
                 ['label' => 'Documentos / OCR', 'url' => route('admin.institucional.documentos.index')],
             ],
             Roles::ADMIN_GENERAL => [
