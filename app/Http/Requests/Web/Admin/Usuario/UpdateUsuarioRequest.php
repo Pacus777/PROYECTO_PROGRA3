@@ -37,7 +37,11 @@ class UpdateUsuarioRequest extends FormRequest
         $usuario = $this->route('usuario');
 
         return [
-            'id_rol_usu' => ['sometimes', 'integer', 'exists:rol,id_rol'],
+            'id_rol_usu' => [
+                'sometimes',
+                'integer',
+                Rule::exists('rol', 'id_rol')->where(fn ($query) => $query->whereIn('nombre_rol', Roles::assignable())),
+            ],
             'id_ued_usu' => ['nullable', 'integer', 'exists:unidad_educativa,id_ued'],
             'correo_usu' => [
                 'sometimes',
@@ -74,7 +78,7 @@ class UpdateUsuarioRequest extends FormRequest
             $rol = \App\Models\Rol::query()->find($rolId);
 
             if ($rol && $rol->nombre_rol === Roles::ADMIN_INSTITUCIONAL && empty($uedId)) {
-                $validator->errors()->add('id_ued_usu', 'El administrador institucional debe tener unidad educativa asignada.');
+                $validator->errors()->add('id_ued_usu', 'La cuenta de unidad educativa (director / secretaría) debe tener un colegio asignado.');
             }
         });
     }

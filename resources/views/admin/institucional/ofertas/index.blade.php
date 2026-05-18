@@ -8,9 +8,12 @@
 @endsection
 
 @section('content')
-    <div class="mb-8">
-        <p class="text-xs text-slate-400">Panel / Ofertas académicas</p>
-        <h1 class="text-2xl font-bold text-slate-900">Ofertas académicas y cupos</h1>
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <p class="text-xs text-slate-400">Panel / Ofertas académicas</p>
+            <h1 class="text-2xl font-bold text-slate-900">Ofertas académicas y cupos</h1>
+        </div>
+        <x-admin.export-report route="admin.institucional.ofertas.export" />
     </div>
 
     <form method="POST" action="{{ route('admin.institucional.ofertas.store') }}" class="mb-8 grid gap-3 rounded-2xl bg-white p-5 shadow-sm md:grid-cols-3">

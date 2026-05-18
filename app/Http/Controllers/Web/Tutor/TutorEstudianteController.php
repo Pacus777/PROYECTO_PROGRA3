@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Web\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Web\Tutor\Concerns\ResolvesTutorContext;
-use App\Models\Estudiante;
+use App\Support\EstudianteIdentificador;
 use App\Services\TutorVinculoService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +33,8 @@ class TutorEstudianteController extends Controller
     {
         $request->validate([
             'codigo_est' => ['required', 'string', 'max:40'],
+        ], [
+            'codigo_est.required' => 'Ingresa el RUDE o el código del estudiante.',
         ]);
 
         $tutor = $this->tutorFromRequest($request);
@@ -41,12 +43,10 @@ class TutorEstudianteController extends Controller
             return back()->with('error', 'No hay perfil de tutor asociado a tu cuenta.');
         }
 
-        $estudiante = Estudiante::query()
-            ->where('codigo_est', trim($request->input('codigo_est')))
-            ->first();
+        $estudiante = EstudianteIdentificador::buscarPorCodigoOVinculo($request->input('codigo_est'));
 
         if ($estudiante === null) {
-            return back()->with('error', 'No se encontró ningún estudiante con ese código.');
+            return back()->with('error', 'No se encontró ningún estudiante con ese RUDE o código.');
         }
 
         try {

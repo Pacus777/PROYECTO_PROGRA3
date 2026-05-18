@@ -8,65 +8,64 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-4xl">
+    @php
+        $rolNombre = $usuario->rol->nombre_rol ?? '';
+        $isAdminGeneral = $rolNombre === \App\Support\Roles::ADMIN_GENERAL && !empty($adminDashboard);
+    @endphp
+    <div class="w-full">
         <div class="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-8 text-white">
             <div class="absolute -right-14 -top-14 h-48 w-48 rounded-full bg-white/10"></div>
-            <p class="text-xs uppercase tracking-[0.2em] text-white/70">Panel principal</p>
-            <h1 class="mt-2 text-3xl font-bold">Bienvenido al sistema de admisión</h1>
-            <p class="mt-2 text-sm text-white/80">Gestiona todo el flujo académico y administrativo desde un solo lugar.</p>
+            <p class="text-xs uppercase tracking-[0.2em] text-white/70">{{ \App\Support\Roles::label($rolNombre) }}</p>
+            <h1 class="mt-2 text-3xl font-bold">{{ \App\Support\Roles::panelTitle($rolNombre) }}</h1>
+            <p class="mt-2 text-sm text-white/80">{{ \App\Support\Roles::panelSubtitle($rolNombre) }}</p>
         </div>
 
         <section class="rounded-2xl bg-white p-8 shadow-sm">
             <h2 class="text-xl font-semibold text-slate-900">Resumen rápido</h2>
             <p class="mt-2 text-slate-600 leading-relaxed">
-                Bienvenido al panel principal del sistema de admisión escolar.
+                {{ \App\Support\Roles::description($rolNombre) }}
             </p>
 
-            @if(($usuario->rol->nombre_rol ?? '') === \App\Support\Roles::ADMIN_GENERAL && !empty($adminStats))
-                @php $as = $adminStats; @endphp
-                <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <article class="rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 p-5 text-white shadow-lg">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-100">Usuarios</p>
-                        <p class="mt-2 text-4xl font-black">{{ $as['usuarios'] }}</p>
-                        <p class="mt-1 text-xs text-indigo-200">Registrados</p>
-                    </article>
-                    <article class="rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 p-5 text-white shadow-lg">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-violet-100">Unidades</p>
-                        <p class="mt-2 text-4xl font-black">{{ $as['unidades'] }}</p>
-                        <p class="mt-1 text-xs text-violet-200">Educativas</p>
-                    </article>
-                    <article class="rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 p-5 text-white shadow-lg">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-cyan-100">Gestiones</p>
-                        <p class="mt-2 text-4xl font-black">{{ $as['gestiones'] }}</p>
-                        <p class="mt-1 text-xs text-cyan-200">Períodos</p>
-                    </article>
-                    <article class="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-5 text-white shadow-lg">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-100">Activa</p>
-                        <p class="mt-2 text-sm font-bold leading-tight">{{ $as['gestion_activa'] }}</p>
-                        <p class="mt-1 text-xs text-emerald-200">Gestión vigente</p>
-                    </article>
+            @if($isAdminGeneral)
+                <div class="mt-8">
+                    @include('admin.dashboard.charts', ['adminDashboard' => $adminDashboard])
                 </div>
-                <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+
+                <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     <a href="{{ route('admin.usuarios.index') }}"
                        class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-indigo-200 hover:bg-indigo-50">
                         <span class="rounded-lg bg-indigo-100 p-2 text-indigo-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-1a4 4 0 00-5-3.87M9 20H4v-1a4 4 0 015-3.87m0-6.13a4 4 0 110-8 4 4 0 010 8zm8 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         </span>
-                        <span class="text-sm font-semibold text-slate-700">Gestionar usuarios</span>
+                        <span class="text-sm font-semibold text-slate-700">Usuarios</span>
+                    </a>
+                    <a href="{{ route('admin.estudiantes.index') }}"
+                       class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-violet-200 hover:bg-violet-50">
+                        <span class="rounded-lg bg-violet-100 p-2 text-violet-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/></svg>
+                        </span>
+                        <span class="text-sm font-semibold text-slate-700">Postulantes</span>
+                    </a>
+                    <a href="{{ route('admin.tutores.index') }}"
+                       class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-fuchsia-200 hover:bg-fuchsia-50">
+                        <span class="rounded-lg bg-fuchsia-100 p-2 text-fuchsia-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </span>
+                        <span class="text-sm font-semibold text-slate-700">Tutores</span>
                     </a>
                     <a href="{{ route('admin.gestiones.index') }}"
                        class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-indigo-200 hover:bg-indigo-50">
                         <span class="rounded-lg bg-cyan-100 p-2 text-cyan-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </span>
-                        <span class="text-sm font-semibold text-slate-700">Gestionar gestiones</span>
+                        <span class="text-sm font-semibold text-slate-700">Gestiones</span>
                     </a>
                     <a href="{{ route('admin.unidades.index') }}"
-                       class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-indigo-200 hover:bg-indigo-50">
-                        <span class="rounded-lg bg-violet-100 p-2 text-violet-600">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21h16M6 21V7l6-4 6 4v14M9 9h.01M9 12h.01M9 15h.01M15 9h.01M15 12h.01M15 15h.01"/></svg>
+                       class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 transition hover:border-emerald-200 hover:bg-emerald-50">
+                        <span class="rounded-lg bg-emerald-100 p-2 text-emerald-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21h16M6 21V7l6-4 6 4v14"/></svg>
                         </span>
-                        <span class="text-sm font-semibold text-slate-700">Unidades educativas</span>
+                        <span class="text-sm font-semibold text-slate-700">Unidades</span>
                     </a>
                 </div>
             @endif
@@ -265,7 +264,7 @@
                 </article>
                 <article class="rounded-xl border border-slate-100 bg-slate-50/80 p-4">
                     <strong class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Rol</strong>
-                    <span class="mt-1 block text-sm font-medium text-slate-900">{{ $usuario->rol->nombre_rol ?? 'sin rol' }}</span>
+                    <span class="mt-1 block text-sm font-medium text-slate-900">{{ \App\Support\Roles::label($usuario->rol->nombre_rol ?? null) }}</span>
                 </article>
                 <article class="rounded-xl border border-slate-100 bg-slate-50/80 p-4">
                     <strong class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Correo</strong>

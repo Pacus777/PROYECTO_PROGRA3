@@ -28,6 +28,7 @@
                 {{ $label }}
             </a>
         @endforeach
+        <x-admin.export-report route="admin.institucional.documentos.export" class="ml-auto" />
     </div>
 
     @php

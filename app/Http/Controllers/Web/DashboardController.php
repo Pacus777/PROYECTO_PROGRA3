@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\EstadoPostulacion;
-use App\Models\Gestion;
 use App\Models\Postulacion;
 use App\Models\Tutor;
-use App\Models\UnidadEducativa;
 use App\Models\Usuario;
+use App\Services\AdminDashboardChartService;
 use App\Support\Roles;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -16,6 +15,10 @@ use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly AdminDashboardChartService $adminDashboardCharts,
+    ) {}
+
     public function __invoke(Request $request): View
     {
         /** @var int $usuarioId */
@@ -26,32 +29,25 @@ class DashboardController extends Controller
             ->findOrFail($usuarioId);
 
         $tutorDashboard = $this->buildTutorDashboardContext($usuario);
-        $adminStats = $this->buildAdminGeneralStats($usuario);
+        $adminDashboard = $this->buildAdminGeneralDashboard($usuario);
 
         return view('dashboard', [
             'usuario' => $usuario,
             'tutorDashboard' => $tutorDashboard,
-            'adminStats' => $adminStats,
+            'adminDashboard' => $adminDashboard,
         ]);
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function buildAdminGeneralStats(Usuario $usuario): array
+    private function buildAdminGeneralDashboard(Usuario $usuario): array
     {
         if (($usuario->rol->nombre_rol ?? '') !== Roles::ADMIN_GENERAL) {
             return [];
         }
 
-        $gestionActiva = Gestion::query()->where('activa_ges', true)->first();
-
-        return [
-            'usuarios' => Usuario::query()->count(),
-            'unidades' => UnidadEducativa::query()->count(),
-            'gestiones' => Gestion::query()->count(),
-            'gestion_activa' => $gestionActiva?->nombre_ges ?? 'Ninguna',
-        ];
+        return $this->adminDashboardCharts->build();
     }
 
     /**

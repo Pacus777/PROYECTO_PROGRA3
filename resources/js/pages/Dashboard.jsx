@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const ROLE_LABELS = {
+    admin_general: 'Administrador general',
+    admin_institucional: 'Administrador institucional',
+    tutor: 'Tutor',
+};
+
+function roleLabel(nombreRol) {
+    if (!nombreRol) return '—';
+    return ROLE_LABELS[nombreRol] ?? nombreRol.replaceAll('_', ' ');
+}
+
 export default function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -80,7 +91,7 @@ export default function Dashboard() {
                             </div>
                             <div>
                                 <dt className="font-medium text-slate-700">Rol</dt>
-                                <dd>{user.rol?.nombre_rol ?? '—'}</dd>
+                                <dd>{roleLabel(user.rol?.nombre_rol)}</dd>
                             </div>
                             <div>
                                 <dt className="font-medium text-slate-700">Nombre</dt>

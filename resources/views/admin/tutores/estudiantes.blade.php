@@ -40,6 +40,11 @@
         </div>
     @endif
 
+    <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+        <p class="font-semibold">Varios tutores por estudiante</p>
+        <p class="mt-1 text-indigo-800">Puedes vincular al mismo postulante a más de un tutor (padre y madre). También en <strong>Postulantes → Editar</strong>. El <strong>RUDE</strong> es del estudiante; la <strong>UE matrícula</strong> indica en qué colegio está inscrito hoy.</p>
+    </div>
+
     {{-- Tabla de estudiantes vinculados --}}
     <div class="mb-8 overflow-hidden rounded-2xl bg-white shadow-sm">
         <div class="border-b border-slate-100 px-6 py-4">
@@ -51,7 +56,9 @@
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Nombre completo</th>
                         <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">CI</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Código</th>
+                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">RUDE</th>
+                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">UE matrícula</th>
+                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Cód. vínculo</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">Acciones</th>
                     </tr>
                 </thead>
@@ -64,8 +71,18 @@
                                 {{ $estudiante->persona->ap_materno_per }}
                             </td>
                             <td class="px-6 py-4 text-slate-600">{{ $estudiante->persona->ci_per ?? '—' }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $estudiante->codigo_est ?? '—' }}</td>
+                            <td class="px-6 py-4 font-mono text-xs text-emerald-800">{{ $estudiante->rude_est ?? '—' }}</td>
+                            <td class="px-6 py-4 text-xs text-slate-600">
+                                @if($estudiante->unidadMatriculaActual)
+                                    {{ $estudiante->unidadMatriculaActual->nombre_ued }}
+                                @else
+                                    <span class="text-slate-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 font-mono text-xs text-slate-600">{{ $estudiante->codigo_est ?? '—' }}</td>
                             <td class="px-6 py-4 text-right">
+                                <a href="{{ route('admin.estudiantes.edit', $estudiante) }}"
+                                   class="mr-2 inline-flex rounded-lg bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100">Ficha</a>
                                 <form method="POST"
                                       action="{{ route('admin.tutores.estudiantes.detach', [$tutor, $estudiante]) }}"
                                       class="inline"
@@ -81,7 +98,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-16 text-center">
+                            <td colspan="6" class="px-6 py-16 text-center">
                                 <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
                                     <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-1a4 4 0 00-5-3.87M9 20H4v-1a4 4 0 015-3.87m0-6.13a4 4 0 110-8 4 4 0 010 8zm8 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 </div>
@@ -110,7 +127,9 @@
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
                         @foreach($disponibles as $est)
                             <option value="{{ $est->id_est }}">
-                                {{ $est->persona->ci_per ? $est->persona->ci_per.' — ' : '' }}{{ $est->persona->nombres_per }} {{ $est->persona->ap_paterno_per }} {{ $est->persona->ap_materno_per }}
+                                @if($est->rude_est)RUDE {{ $est->rude_est }} — @endif
+                                {{ $est->persona->nombres_per }} {{ $est->persona->ap_paterno_per }}
+                                @if($est->unidadMatriculaActual) (UE: {{ $est->unidadMatriculaActual->nombre_ued }}) @endif
                             </option>
                         @endforeach
                     </select>

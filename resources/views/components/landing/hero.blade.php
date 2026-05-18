@@ -16,11 +16,11 @@
                 </h1>
 
                 <p class="mt-6 text-lg text-slate-600 max-w-xl leading-relaxed">
-                    Nuestro sistema digital facilita todo el proceso de admisión: desde el registro hasta la asignación de cupos, con seguimiento en tiempo real para familias y tutores.
+                    Los tutores y apoderados gestionan la admisión de sus hijos con el <strong class="font-semibold text-slate-700">RUDE</strong>. Sin cuenta para el estudiante: registro, postulación y seguimiento en un solo lugar.
                 </p>
 
                 <div class="mt-10 flex flex-wrap gap-4">
-                    <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-300/50 hover:scale-105 active:scale-95 transition-transform">Postular ahora →</a>
+                    <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-300/50 hover:scale-105 active:scale-95 transition-transform">Ingresar como tutor →</a>
                     <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold border-2 border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600 transition-all">Iniciar sesión</a>
                 </div>
 
@@ -34,7 +34,7 @@
             <div class="order-1 lg:order-2 relative h-[500px] lg:h-[600px]">
                 <div class="absolute -z-10 right-8 top-8 w-96 h-96 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl opacity-60"></div>
                 {{-- Imagen local: coloca el archivo en public/images/landing-hero.jpg (o cambia el nombre y esta ruta) --}}
-                <img src="{{ asset('images/landing-hero.jpg') }}" alt="Estudiante en entorno académico" class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-white">
+                <img src="{{ asset('images/landing-hero.jpg') }}" alt="Familia y proceso de admisión escolar" class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl border border-white">
 
                 <div class="absolute bottom-10 -left-4 bg-white rounded-2xl shadow-xl p-4 border border-slate-100 animate-bounce [animation-duration:3s]">
                     <p class="text-xs text-slate-500">Postulación enviada</p>

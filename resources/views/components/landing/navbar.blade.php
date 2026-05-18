@@ -22,7 +22,7 @@
 
             <div class="hidden lg:flex items-center gap-3">
                 <a href="{{ route('login.show') }}" class="px-5 py-2.5 rounded-xl border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition-colors duration-200">Iniciar sesión</a>
-                <a href="{{ route('login.show') }}" class="px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold shadow-lg shadow-blue-200 hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200">Postular ahora</a>
+                <a href="{{ route('login.show') }}" class="px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold shadow-lg shadow-blue-200 hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200">Acceso tutor</a>
             </div>
 
             <button @click="mobileOpen = !mobileOpen" class="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-700" aria-label="Abrir menú">
@@ -49,7 +49,7 @@
             <a @click="mobileOpen=false" href="#contacto" class="block">Contacto</a>
             <div class="pt-3 flex flex-col gap-2">
                 <a href="{{ route('login.show') }}" class="text-center px-4 py-2.5 rounded-xl border border-blue-600 text-blue-600 font-semibold">Iniciar sesión</a>
-                <a href="{{ route('login.show') }}" class="text-center px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold">Postular ahora</a>
+                <a href="{{ route('login.show') }}" class="text-center px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold">Acceso tutor</a>
             </div>
         </div>
     </div>

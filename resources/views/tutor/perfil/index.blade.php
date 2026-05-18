@@ -23,7 +23,7 @@
                 <h2 class="mb-4 text-lg font-semibold text-slate-800">Usuario</h2>
                 <dl class="space-y-2 text-sm text-slate-700">
                     <div><dt class="font-semibold text-slate-500">Correo</dt><dd>{{ $usuario->correo_usu }}</dd></div>
-                    <div><dt class="font-semibold text-slate-500">Rol</dt><dd class="capitalize">{{ str_replace('_', ' ', $usuario->rol->nombre_rol ?? '—') }}</dd></div>
+<div><dt class="font-semibold text-slate-500">Rol</dt><dd>{{ \App\Support\Roles::label($usuario->rol->nombre_rol ?? null) }}</dd></div>
                     <div><dt class="font-semibold text-slate-500">Activo</dt><dd>{{ $usuario->activo_usu ? 'Sí' : 'No' }}</dd></div>
                 </dl>
             </section>

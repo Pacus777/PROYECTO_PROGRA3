@@ -6,9 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard | AdmisiónEscolar')</title>
 
-    @vite(['resources/css/app.css'])
+    @include('partials.favicon')
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/app.css'])
+    @stack('styles')
 
     <style>
         .custom-scrollbar {
@@ -59,6 +60,10 @@
         .pulse-soft {
             animation: pulse-soft 1.8s ease-in-out infinite;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="bg-[#F5F7FF] text-[#1E1B4B] antialiased">
@@ -72,16 +77,18 @@
     $dashboardUserName = trim(($dashboardUser->persona->nombres_per ?? '').' '.($dashboardUser->persona->ap_paterno_per ?? ''));
     $dashboardUserName = $dashboardUserName !== '' ? $dashboardUserName : ($dashboardUser->correo_usu ?? 'Usuario');
     $dashboardRole = $dashboardUser->rol->nombre_rol ?? 'usuario';
+    $dashboardRoleLabel = \App\Support\Roles::label($dashboardRole);
     $dashboardInitial = strtoupper(mb_substr($dashboardUserName, 0, 1));
 @endphp
 
 <div x-data="{ sidebarOpen: true, mobileSidebarOpen: false, successToast: true }">
-    @include('layouts._sidebar', ['dashboardUser' => $dashboardUser, 'dashboardUserName' => $dashboardUserName, 'dashboardRole' => $dashboardRole, 'dashboardInitial' => $dashboardInitial])
+    @include('layouts._sidebar', ['dashboardUser' => $dashboardUser, 'dashboardUserName' => $dashboardUserName, 'dashboardRole' => $dashboardRole, 'dashboardRoleLabel' => $dashboardRoleLabel, 'dashboardInitial' => $dashboardInitial])
 
     <div :class="sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'" class="min-h-screen transition-all duration-300">
-        @include('layouts._topbar', ['dashboardUser' => $dashboardUser, 'dashboardUserName' => $dashboardUserName, 'dashboardRole' => $dashboardRole, 'dashboardInitial' => $dashboardInitial])
+        @include('layouts._topbar', ['dashboardUser' => $dashboardUser, 'dashboardUserName' => $dashboardUserName, 'dashboardRole' => $dashboardRole, 'dashboardRoleLabel' => $dashboardRoleLabel, 'dashboardInitial' => $dashboardInitial])
 
-        <main class="p-6 lg:p-8 animate-fadeInUp">
+        <main class="flex justify-center p-6 lg:p-8 animate-fadeInUp">
+            <div class="w-full max-w-7xl mx-auto min-w-0">
             {{-- Toast de éxito con auto-cierre --}}
             @if(session('success'))
                 <div
@@ -118,6 +125,7 @@
             @endif
 
             @yield('content')
+            </div>
         </main>
     </div>
 
@@ -128,6 +136,13 @@
         class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
     ></div>
 </div>
+
+@if(($dashboardRole ?? '') === \App\Support\Roles::TUTOR)
+    <x-tutor.assistant-widget context="tutor" />
+@endif
+
+    @stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 </body>
 </html>
 

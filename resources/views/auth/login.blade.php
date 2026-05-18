@@ -116,21 +116,22 @@
                         </div>
                     @endif
 
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-8 mb-3">¿Cómo ingresas?</p>
-                    <div class="flex gap-2 p-1 bg-slate-100 rounded-2xl">
-                        <button type="button" @click="role='tutor'" :class="role==='tutor' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16 14a4 4 0 10-8 0m8 0a4 4 0 014 4v1H4v-1a4 4 0 014-4m8 0H8"/></svg>
-                            Tutor / Padre
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-8 mb-1">¿Cómo ingresas?</p>
+                    <p class="mb-3 text-xs text-slate-500 leading-relaxed">Hay <strong>tres tipos de cuenta</strong>: Ministerio de Educación, personal de un colegio (director o secretaría) y tutor/apoderado. Los postulantes no inician sesión.</p>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap p-1 bg-slate-100 rounded-2xl">
+                        <button type="button" @click="role='tutor'" :class="role==='tutor' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 min-w-[7rem]">
+                            Tutor / apoderado
                         </button>
-                        <button type="button" @click="role='estudiante'" :class="role==='estudiante' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/></svg>
-                            Estudiante
+                        <button type="button" @click="role='ministerio'" :class="role==='ministerio' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 min-w-[7rem]">
+                            Ministerio
                         </button>
-                        <button type="button" @click="role='admin'" :class="role==='admin' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317a1 1 0 011.35-.936l1.296.518a1 1 0 00.758 0l1.296-.518a1 1 0 011.35.936l.117 1.379a1 1 0 00.516.804l1.184.658a1 1 0 01.432 1.328l-.56 1.266a1 1 0 000 .804l.56 1.266a1 1 0 01-.432 1.328l-1.184.658a1 1 0 00-.516.804l-.117 1.379a1 1 0 01-1.35.936l-1.296-.518a1 1 0 00-.758 0l-1.296.518a1 1 0 01-1.35-.936l-.117-1.379a1 1 0 00-.516-.804l-1.184-.658a1 1 0 01-.432-1.328l.56-1.266a1 1 0 000-.804l-.56-1.266a1 1 0 01.432-1.328l1.184-.658a1 1 0 00.516-.804l.117-1.379zM12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
-                            Administrador
+                        <button type="button" @click="role='colegio'" :class="role==='colegio' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 min-w-[7rem]">
+                            Unidad educativa
                         </button>
                     </div>
+                    <p class="mt-2 text-[11px] text-slate-400 leading-relaxed" x-show="role==='tutor'">Postula, sube documentos y da seguimiento a tus tutelados.</p>
+                    <p class="mt-2 text-[11px] text-slate-400 leading-relaxed" x-show="role==='ministerio'" x-cloak>Visión nacional: postulaciones, colegios y reportes territoriales.</p>
+                    <p class="mt-2 text-[11px] text-slate-400 leading-relaxed" x-show="role==='colegio'" x-cloak>Gestiona ofertas, cupos y postulaciones de su colegio.</p>
 
                     <form method="POST" action="{{ route('login.store') }}" class="mt-8 space-y-5"
                           :class="shakeForm ? 'anim-shake' : ''"
@@ -195,11 +196,13 @@
                     </button>
 
                     <p class="mt-8 text-center text-sm text-slate-500">
-                        ¿No tienes cuenta aún?
-                        <a href="#" class="text-blue-600 font-semibold hover:underline ml-1">Regístrate aquí</a>
+                        ¿Eres tutor o apoderado?
+                        <a href="#" class="text-blue-600 font-semibold hover:underline ml-1">Solicita tu cuenta</a>
                     </p>
                 </div>
             </main>
         </div>
     </section>
+
+    <x-tutor.assistant-widget context="landing" />
 @endsection

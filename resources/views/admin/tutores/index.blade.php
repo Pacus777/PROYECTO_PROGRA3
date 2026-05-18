@@ -12,7 +12,7 @@
         <div>
             <p class="text-xs text-slate-400">Panel / Tutores</p>
             <h1 class="text-2xl font-bold text-slate-900">Tutores</h1>
-            <p class="mt-1 text-sm text-slate-500">Gestiona los vínculos entre tutores y sus estudiantes.</p>
+            <p class="mt-1 text-sm text-slate-500">Apoderados con cuenta. Vinculan postulantes por <strong>RUDE</strong> (identidad del niño, no del colegio).</p>
         </div>
         <a href="{{ route('admin.usuarios.create') }}"
            class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">
@@ -23,6 +23,19 @@
     @if(session('success'))
         <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">{{ session('success') }}</div>
     @endif
+
+    <form method="GET" class="mb-6 flex flex-wrap items-end gap-3">
+        <div class="min-w-[12rem] flex-1">
+            <label class="mb-1 block text-xs font-semibold text-slate-500">Buscar</label>
+            <input type="text" name="q" value="{{ $search ?? '' }}" placeholder="Nombre o CI…"
+                   class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm">
+        </div>
+        <button type="submit" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Buscar</button>
+        @if(!empty($search))
+            <a href="{{ route('admin.tutores.index') }}" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">Limpiar</a>
+        @endif
+        <x-admin.export-report route="admin.tutores.export" />
+    </form>
 
     <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
         <div class="overflow-x-auto">

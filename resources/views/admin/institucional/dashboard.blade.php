@@ -11,7 +11,7 @@
 
 @section('content')
     @php
-        $nombreUsuario = trim(($dashboardUser->persona->nombres_per ?? '').' '.($dashboardUser->persona->ap_paterno_per ?? '')) ?: 'Administrador';
+        $nombreUsuario = trim(($dashboardUser->persona->nombres_per ?? '').' '.($dashboardUser->persona->ap_paterno_per ?? '')) ?: 'Personal del colegio';
         $totalPostulaciones = (int) ($stats['postulaciones'] ?? 0);
         $ofertasActivas = (int) ($stats['ofertas'] ?? 0);
         $cuposDisponibles = (int) ($stats['cupos'] ?? 0);

@@ -39,8 +39,10 @@
         <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
         <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
 
-        <button class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-700">Filtrar</button>
-        <span class="ml-auto text-sm text-slate-500">Mostrando {{ $postulaciones->count() }} resultados</span>
+        <button type="submit" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-700">Filtrar</button>
+        <a href="{{ route('admin.institucional.postulaciones.index') }}" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">Limpiar</a>
+        <x-admin.export-report route="admin.institucional.postulaciones.export" class="ml-auto" />
+        <span class="w-full text-sm text-slate-500 sm:w-auto sm:ml-0">Mostrando {{ $postulaciones->count() }} en esta página</span>
     </form>
 
     <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
@@ -62,7 +64,7 @@
                 @foreach($postulaciones as $p)
                     @php
                         $nombre = trim(($p->estudiante->persona->nombres_per ?? '').' '.($p->estudiante->persona->ap_paterno_per ?? '')) ?: '—';
-                        $correo = $p->estudiante->correo_usu ?? 'Sin correo';
+                        $correo = $p->estudiante->persona->correo_per ?? ($p->estudiante->codigo_est ? 'Cód. '.$p->estudiante->codigo_est : 'Sin contacto');
                         $inicial = strtoupper(mb_substr($nombre, 0, 1));
                         $estado = strtolower($p->estadoPostulacion->nombre_ept ?? 'pendiente');
                         $badge = match (true) {

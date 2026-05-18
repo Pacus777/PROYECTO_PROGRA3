@@ -21,7 +21,10 @@ class TutorVinculoService
 
     public function estudiantesVinculados(Tutor $tutor): Collection
     {
-        return $tutor->estudiantes()->with('persona')->orderBy('id_est')->get();
+        return $tutor->estudiantes()
+            ->with(['persona', 'unidadMatriculaActual'])
+            ->orderBy('id_est')
+            ->get();
     }
 
     public function estudiantesNoVinculados(Tutor $tutor): Collection
@@ -29,7 +32,7 @@ class TutorVinculoService
         $vinculados = $tutor->estudiantes()->pluck('estudiante.id_est');
 
         return Estudiante::query()
-            ->with('persona')
+            ->with(['persona', 'unidadMatriculaActual'])
             ->whereNotIn('id_est', $vinculados)
             ->orderBy('id_est')
             ->get();
@@ -53,5 +56,21 @@ class TutorVinculoService
     public function detach(Tutor $tutor, int $idEst): void
     {
         $tutor->estudiantes()->detach($idEst);
+    }
+
+    public function tutoresVinculados(Estudiante $estudiante): Collection
+    {
+        return $estudiante->tutores()->with('persona')->orderBy('id_tut')->get();
+    }
+
+    public function tutoresDisponibles(Estudiante $estudiante): Collection
+    {
+        $vinculados = $estudiante->tutores()->pluck('tutor.id_tut');
+
+        return Tutor::query()
+            ->with('persona')
+            ->whereNotIn('id_tut', $vinculados)
+            ->orderBy('id_tut')
+            ->get();
     }
 }

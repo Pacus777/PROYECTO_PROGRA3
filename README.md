@@ -140,7 +140,8 @@ Tras ejecutar los seeders, puedes ingresar con:
 | `admin_general` | Administrador del sistema, acceso total |
 | `admin_institucional` | Administrador de una unidad educativa |
 | `tutor` | Apoderado o tutor del estudiante |
-| `estudiante` | Estudiante postulante |
+
+Los **estudiantes postulantes** se registran como datos académicos (tabla `estudiante`), no como usuarios con login. El tutor los vincula por código y gestiona sus postulaciones.
 
 ---
 

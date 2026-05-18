@@ -13,10 +13,13 @@
             <p class="text-xs text-slate-400">Panel / Resultados</p>
             <h1 class="text-2xl font-bold text-slate-900">Resultados y ranking</h1>
         </div>
-        <form method="POST" action="{{ route('admin.institucional.asignacion.store') }}">
-            @csrf
-            <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">Ejecutar asignación</button>
-        </form>
+        <div class="flex flex-wrap gap-2">
+            <x-admin.export-report route="admin.institucional.resultados.export" />
+            <form method="POST" action="{{ route('admin.institucional.asignacion.store') }}">
+                @csrf
+                <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">Ejecutar asignación</button>
+            </form>
+        </div>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">

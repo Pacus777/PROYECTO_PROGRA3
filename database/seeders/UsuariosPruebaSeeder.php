@@ -34,16 +34,6 @@ class UsuariosPruebaSeeder extends Seeder
                     'ap_materno_per' => 'Uno',
                 ],
             ],
-            [
-                'correo_usu' => 'estudiante@gmail.com',
-                'password_plano' => 'estudiante123',
-                'rol' => Roles::ESTUDIANTE,
-                'persona' => [
-                    'nombres_per' => 'Estudiante',
-                    'ap_paterno_per' => 'Demo',
-                    'ap_materno_per' => 'Uno',
-                ],
-            ],
         ];
 
         foreach ($dataset as $item) {

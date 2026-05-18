@@ -37,8 +37,24 @@
         <div class="rounded-2xl bg-white p-6 shadow-sm">
             <h2 class="mb-4 text-xs font-bold uppercase tracking-wide text-slate-400">Cuenta</h2>
             <dl class="space-y-3 text-sm">
-                <div><dt class="text-slate-500">Rol</dt><dd class="font-semibold text-slate-900">{{ $usuario->rol->nombre_rol ?? '—' }}</dd></div>
-                <div><dt class="text-slate-500">Unidad educativa</dt><dd class="font-semibold text-slate-900">{{ $usuario->unidadEducativa->nombre_ued ?? '—' }}</dd></div>
+                <div>
+                    <dt class="text-slate-500">Tipo de cuenta</dt>
+                    <dd class="font-semibold text-slate-900">{{ \App\Support\Roles::label($usuario->rol->nombre_rol ?? null) }}</dd>
+                    <dd class="mt-1 text-xs text-slate-500">{{ \App\Support\Roles::description($usuario->rol->nombre_rol ?? null) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-500">Unidad educativa</dt>
+                    <dd class="font-semibold text-slate-900">
+                        @if($usuario->unidadEducativa)
+                            {{ $usuario->unidadEducativa->nombre_ued }}
+                            @if($usuario->unidadEducativa->codigo_ued)
+                                <span class="mt-0.5 block font-mono text-xs font-normal text-indigo-600">Código UE: {{ $usuario->unidadEducativa->codigo_ued }}</span>
+                            @endif
+                        @else
+                            —
+                        @endif
+                    </dd>
+                </div>
                 <div><dt class="text-slate-500">Estado</dt><dd class="font-semibold text-slate-900">{{ $usuario->activo_usu ? 'Activo' : 'Inactivo' }}</dd></div>
                 @if($isTutorRole)
                     <div>

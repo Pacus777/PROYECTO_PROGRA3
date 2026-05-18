@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             TipoDocumentoSeeder::class,
             TipoCriterioSeeder::class,
             CriterioSeeder::class,
+            TerritorioBoliviaSeeder::class,
             UnidadEducativaSeeder::class,
             AdminInstitucionalSeeder::class,
             AdminUsuarioSeeder::class,

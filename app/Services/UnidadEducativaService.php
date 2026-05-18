@@ -28,7 +28,15 @@ class UnidadEducativaService
 
     public function update(UnidadEducativa $unidad, array $data): UnidadEducativa
     {
-        $unidad->update(collect($data)->only(['nombre_ued', 'codigo_ued', 'direccion_ued'])->all());
+        $unidad->update(collect($data)->only([
+            'nombre_ued',
+            'codigo_ued',
+            'direccion_ued',
+            'lat_ued',
+            'lng_ued',
+            'id_mun_ued',
+            'id_dis_ued',
+        ])->all());
 
         return $unidad->fresh();
     }

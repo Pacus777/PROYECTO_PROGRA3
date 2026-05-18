@@ -23,7 +23,11 @@ class UpdateUsuarioRequest extends FormRequest
         $usuario = $this->route('usuario');
 
         return [
-            'id_rol_usu' => ['sometimes', 'integer', 'exists:rol,id_rol'],
+            'id_rol_usu' => [
+                'sometimes',
+                'integer',
+                Rule::exists('rol', 'id_rol')->where(fn ($query) => $query->whereIn('nombre_rol', Roles::assignable())),
+            ],
             'id_ued_usu' => ['nullable', 'integer', 'exists:unidad_educativa,id_ued'],
             'correo_usu' => [
                 'sometimes',
