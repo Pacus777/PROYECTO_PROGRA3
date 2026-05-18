@@ -36,10 +36,14 @@
                     <thead class="border-b border-slate-100 bg-slate-50">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">#</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Prioridad</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Estudiante</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Curso</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Fecha</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Estado</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Avance
+                            </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Puntaje</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">Acciones</th>
                         </tr>
@@ -51,11 +55,46 @@
                             @endphp
                             <tr class="text-slate-700">
                                 <td class="px-6 py-4 text-slate-500">{{ $pos->id_pos }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                                        {{ $pos->prioridad_pos }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 font-medium text-slate-900">{{ $nom ?: '—' }}</td>
                                 <td class="px-6 py-4">{{ $pos->ofertaAcademica->curso->nombre_cur ?? '—' }} {{ $pos->ofertaAcademica->paralelo->nombre_par ?? '' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ optional($pos->fecha_pos)->format('d/m/Y H:i') ?? '—' }}</td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{{ $pos->estadoPostulacion->nombre_ept ?? '—' }}</span>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    @php
+                                        $porcentaje = $pos->porcentajeDocumental();
+
+                                        $etapaTexto = [
+                                            'registrada' => 'Registrada',
+                                            'documentos_revision' => 'Docs. en revisión',
+                                            'documentos_completos' => 'Docs. completos',
+                                            'resultado' => 'Resultado generado',
+                                            'asignado' => 'Cupo asignado',
+                                            'lista_espera' => 'Lista de espera',
+                                        ];
+
+                                        $etapa = $pos->etapaTutor();
+                                    @endphp
+
+                                    <div class="min-w-[150px]">
+                                        <div class="mb-1 flex items-center justify-between text-xs">
+                                            <span class="font-semibold text-slate-600">
+                                                {{ $etapaTexto[$etapa] ?? 'En proceso' }}
+                                            </span>
+                                            <span class="text-slate-400">{{ $porcentaje }}%</span>
+                                        </div>
+
+                                        <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                                            <div class="h-full rounded-full bg-indigo-500" style="width: {{ $porcentaje }}%"></div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">{{ $pos->resultado->puntaje_total_res ?? '—' }}</td>
                                 <td class="px-6 py-4 text-right">

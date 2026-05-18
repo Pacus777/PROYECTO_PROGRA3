@@ -27,6 +27,8 @@ final class PostulacionInstitucionalService
                 'ofertaAcademica.paralelo',
                 'estudiante.persona',
                 'estudiante.unidadMatriculaActual',
+                'ofertaAcademica.tiposDocumentoRequeridos',
+                'documentos.tipoDocumento',
             ])
             ->whereHas('ofertaAcademica', fn (Builder $q) => $q->where('id_ued_oac', $unidadId));
 

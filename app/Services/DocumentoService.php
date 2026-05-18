@@ -19,10 +19,12 @@ class DocumentoService
             $path = $archivo->store('documentos/'.$postulacion->id_pos, 'local');
 
             $documento = Documento::query()->create([
-                'id_pos_doc'       => $postulacion->id_pos,
-                'id_tdo_doc'       => $tipoId,
+                'id_pos_doc' => $postulacion->id_pos,
+                'id_tdo_doc' => $tipoId,
                 'ruta_archivo_doc' => $path,
-                'estado_doc'       => 'pendiente',
+                'estado_doc' => 'pendiente',
+                'observacion_doc' => null,
+                'fecha_revision_doc' => null,
             ]);
 
             ProcesamientoOcr::query()->create([
@@ -34,9 +36,13 @@ class DocumentoService
         });
     }
 
-    public function updateEstado(Documento $documento, string $estado): void
+    public function updateEstado(Documento $documento, string $estado, ?string $observacion = null): void
     {
-        $documento->update(['estado_doc' => $estado]);
+        $documento->update([
+            'estado_doc' => $estado,
+            'observacion_doc' => $observacion,
+            'fecha_revision_doc' => now(),
+        ]);
     }
 
     public function delete(Documento $documento): void

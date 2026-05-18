@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class OfertaAcademica extends Model
 {
@@ -19,7 +21,17 @@ class OfertaAcademica extends Model
         'id_cur_oac',
         'id_par_oac',
         'descripcion_oac',
+        'fecha_inicio_postulacion_oac',
+        'fecha_fin_postulacion_oac',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'fecha_inicio_postulacion_oac' => 'datetime',
+            'fecha_fin_postulacion_oac' => 'datetime',
+        ];
+    }
 
     public function gestion(): BelongsTo
     {
@@ -64,5 +76,48 @@ class OfertaAcademica extends Model
     public function getRouteKeyName(): string
     {
         return 'id_oac';
+    }
+
+    public function scopeAbiertasParaPostulacion(Builder $query): Builder
+    {
+        $ahora = now();
+
+        return $query
+            ->where('fecha_inicio_postulacion_oac', '<=', $ahora)
+            ->where('fecha_fin_postulacion_oac', '>=', $ahora);
+    }
+
+    public function estaAbiertaParaPostulacion(): bool
+    {
+        return now()->betweenIncluded(
+            $this->fecha_inicio_postulacion_oac,
+            $this->fecha_fin_postulacion_oac
+        );
+    }
+
+    public function estadoConvocatoria(): string
+    {
+        if (now()->lt($this->fecha_inicio_postulacion_oac)) {
+            return 'proxima';
+        }
+
+        if ($this->estaAbiertaParaPostulacion()) {
+            return 'abierta';
+        }
+
+        return 'cerrada';
+    }
+
+    public function tiposDocumentoRequeridos(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TipoDocumento::class,
+            'oferta_documento_requerido',
+            'id_oac_odr',
+            'id_tdo_odr',
+            'id_oac',
+            'id_tdo'
+        )->withPivot(['id_odr', 'obligatorio_odr'])
+        ->withTimestamps();
     }
 }

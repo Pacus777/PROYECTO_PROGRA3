@@ -102,6 +102,13 @@
             </form>
         </x-institucional.panel>
 
+        <div class="mb-4 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+            <p class="font-semibold">Promoción automática activa</p>
+            <p class="mt-1">
+                Cuando un tutor rechaza un cupo, el sistema libera la vacante y promueve automáticamente al primer postulante de esta lista.
+            </p>
+        </div>
+
         <x-institucional.panel module="lista-espera" :title="'Cola de espera ('.$registros->total().')'">
             <div class="overflow-x-auto" data-inst-table>
                 <table class="min-w-full text-sm">

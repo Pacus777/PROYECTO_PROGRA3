@@ -14,9 +14,17 @@
         <p class="mt-1 text-sm text-slate-500">El estado inicial se asigna con la misma lógica que la API (<code class="rounded bg-slate-100 px-1 text-xs">borrador</code> por defecto vía servicio).</p>
     </div>
 
-    @if($estudiantes->isEmpty())
+    @if(session('error'))
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+            <p class="font-semibold">{{ session('error') }}</p>
+        </div>
+    @elseif($estudiantes->isEmpty())
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
             <p class="font-semibold">No puedes crear postulaciones sin estudiantes vinculados.</p>
+        </div>
+    @elseif($ofertas->isEmpty())
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+            <p class="font-semibold">No puedes realizar esta acción porque la oferta ya cerró su periodo de postulación.</p>
         </div>
     @else
         <form method="POST" action="{{ route('tutor.postulaciones.store') }}" class="max-w-3xl space-y-6 rounded-2xl bg-white p-8 shadow-sm">
@@ -48,6 +56,31 @@
                         <option value="{{ $oac->id_oac }}" @selected(old('id_oac_pos') == $oac->id_oac)>{{ $label ?: 'Oferta #'.$oac->id_oac }}</option>
                     @endforeach
                 </select>
+                @error('id_oac_pos')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label for="prioridad_pos" class="block text-sm font-semibold text-slate-700">
+                    Prioridad de postulación
+                </label>
+
+                <input type="number"
+                       id="prioridad_pos"
+                       name="prioridad_pos"
+                       min="1"
+                       max="20"
+                       value="{{ old('prioridad_pos', 1) }}"
+                       required
+                       class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+
+                <p class="mt-1 text-xs text-slate-500">
+                    Usa 1 para tu primera opción, 2 para tu segunda opción y así sucesivamente.
+                </p>
+
+                @error('prioridad_pos')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
             <div>
                 <label for="observaciones_pos" class="block text-sm font-semibold text-slate-700">Observaciones (opcional)</label>

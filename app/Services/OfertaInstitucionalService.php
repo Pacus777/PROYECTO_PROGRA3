@@ -19,7 +19,7 @@ final class OfertaInstitucionalService
     public function queryParaUnidad(int $unidadId, Request $request): Builder
     {
         $query = OfertaAcademica::query()
-            ->with(['gestion', 'nivel', 'curso', 'paralelo', 'cupos'])
+            ->with(['gestion', 'nivel', 'curso', 'paralelo', 'cupos', 'tiposDocumentoRequeridos'])
             ->withCount('postulaciones')
             ->where('id_ued_oac', $unidadId);
 

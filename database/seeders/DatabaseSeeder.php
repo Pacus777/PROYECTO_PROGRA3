@@ -18,11 +18,13 @@ class DatabaseSeeder extends Seeder
             TipoCriterioSeeder::class,
             CriterioSeeder::class,
             GestionSeeder::class,
+            NivelCursoParaleloSeeder::class,
             TerritorioBoliviaSeeder::class,
             UnidadEducativaSeeder::class,
             AdminInstitucionalSeeder::class,
             AdminUsuarioSeeder::class,
             UsuariosPruebaSeeder::class,
+            TutorDemoSeeder::class,
         ]);
     }
 }

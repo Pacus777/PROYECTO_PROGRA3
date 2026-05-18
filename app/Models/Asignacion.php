@@ -16,12 +16,14 @@ class Asignacion extends Model
         'id_cup_asi',
         'estado_asi',
         'fecha_asi',
+        'fecha_limite_respuesta_asi',
     ];
 
     protected function casts(): array
     {
         return [
             'fecha_asi' => 'datetime',
+            'fecha_limite_respuesta_asi' => 'datetime',
         ];
     }
 
@@ -33,5 +35,17 @@ class Asignacion extends Model
     public function cupo(): BelongsTo
     {
         return $this->belongsTo(Cupo::class, 'id_cup_asi', 'id_cup');
+    }
+
+    public function estaPendienteRespuesta(): bool
+    {
+        return in_array($this->estado_asi, ['pendiente', 'asignado'], true);
+    }
+
+    public function estaVencida(): bool
+    {
+        return $this->estaPendienteRespuesta()
+            && $this->fecha_limite_respuesta_asi !== null
+            && now()->greaterThan($this->fecha_limite_respuesta_asi);
     }
 }

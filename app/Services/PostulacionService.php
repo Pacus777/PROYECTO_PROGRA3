@@ -31,13 +31,16 @@ class PostulacionService
                 ->value('id_ept');
 
             if ($eptId === null) {
-                $eptId = EstadoPostulacion::query()->orderBy('id_ept')->value('id_ept');
+                $eptId = EstadoPostulacion::query()
+                    ->orderBy('id_ept')
+                    ->value('id_ept');
             }
 
             return $this->repository->create([
                 'id_est_pos' => $data['id_est_pos'],
                 'id_oac_pos' => $data['id_oac_pos'],
                 'id_ept_pos' => $eptId,
+                'prioridad_pos' => $data['prioridad_pos'],
                 'fecha_pos' => $data['fecha_pos'] ?? now(),
                 'observaciones_pos' => $data['observaciones_pos'] ?? null,
             ]);
@@ -50,11 +53,16 @@ class PostulacionService
             'id_est_pos',
             'id_oac_pos',
             'id_ept_pos',
+            'prioridad_pos',
             'fecha_pos',
             'observaciones_pos',
         ])->all());
 
-        return $postulacion->fresh(['estudiante.persona', 'ofertaAcademica', 'estadoPostulacion']);
+        return $postulacion->fresh([
+            'estudiante.persona',
+            'ofertaAcademica',
+            'estadoPostulacion',
+        ]);
     }
 
     public function delete(Postulacion $postulacion): void

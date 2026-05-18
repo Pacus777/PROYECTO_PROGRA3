@@ -8,6 +8,7 @@ use App\Http\Requests\Web\AdminInstitucional\StoreOfertaAcademicaRequest;
 use App\Http\Requests\Web\AdminInstitucional\UpdateOfertaAcademicaRequest;
 use App\Models\Cupo;
 use App\Models\OfertaAcademica;
+use App\Models\TipoDocumento;
 use App\Services\OfertaInstitucionalService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +28,10 @@ class OfertaController extends BaseInstitutionalController
 
         $catalogos = $this->service->catalogosAcademicos();
         $gestionActiva = $catalogos['gestiones']->firstWhere('activa_ges', true);
+
+        $tiposDocumento = TipoDocumento::query()
+            ->orderBy('nombre_tdo')
+            ->get();
 
         $ofertas = $this->service
             ->queryParaUnidad($unidadId, $request)
@@ -60,6 +65,7 @@ class OfertaController extends BaseInstitutionalController
             'resumen' => $resumen,
             'cursosParaJs' => $cursosParaJs,
             'paralelosParaJs' => $paralelosParaJs,
+            'tiposDocumento' => $tiposDocumento,
         ]);
     }
 
@@ -91,8 +97,23 @@ class OfertaController extends BaseInstitutionalController
 
         DB::transaction(function () use ($data, $request, $total, $disponibles): void {
             $oferta = OfertaAcademica::query()->create(collect($data)->only([
-                'id_ges_oac', 'id_ued_oac', 'id_niv_oac', 'id_cur_oac', 'id_par_oac', 'descripcion_oac',
+                'id_ges_oac',
+                'id_ued_oac',
+                'id_niv_oac',
+                'id_cur_oac',
+                'id_par_oac',
+                'descripcion_oac',
+                'fecha_inicio_postulacion_oac',
+                'fecha_fin_postulacion_oac',
             ])->all());
+
+            $documentosRequeridos = collect($data['documentos_requeridos'] ?? [])
+                ->mapWithKeys(fn ($id) => [
+                    (int) $id => ['obligatorio_odr' => true],
+                ])
+                ->all();
+
+            $oferta->tiposDocumentoRequeridos()->sync($documentosRequeridos);
 
             if ($request->filled('total_cup') || $request->filled('disponibles_cup')) {
                 Cupo::query()->create([
@@ -114,10 +135,14 @@ class OfertaController extends BaseInstitutionalController
         $this->assertOfertaBelongsToUnidad($oferta_academica, $unidadId);
 
         $oferta_academica->load(['cupos', 'gestion', 'nivel', 'curso', 'paralelo']);
+        $oferta_academica->loadMissing('tiposDocumentoRequeridos');
         $oferta_academica->loadCount('postulaciones');
 
         $catalogos = $this->service->catalogosAcademicos();
         $gestionActiva = $catalogos['gestiones']->firstWhere('activa_ges', true);
+        $tiposDocumento = TipoDocumento::query()
+            ->orderBy('nombre_tdo')
+            ->get();
 
         $cursosParaJs = $catalogos['cursos']->map(fn ($c) => [
             'id' => $c->id_cur,
@@ -140,6 +165,7 @@ class OfertaController extends BaseInstitutionalController
             'gestionActiva' => $gestionActiva,
             'cursosParaJs' => $cursosParaJs,
             'paralelosParaJs' => $paralelosParaJs,
+            'tiposDocumento' => $tiposDocumento,
         ]);
     }
 
@@ -161,7 +187,16 @@ class OfertaController extends BaseInstitutionalController
                 ->withInput();
         }
 
+        $documentosRequeridos = collect($data['documentos_requeridos'] ?? [])
+            ->mapWithKeys(fn ($id) => [
+                (int) $id => ['obligatorio_odr' => true],
+            ])
+            ->all();
+
+        unset($data['documentos_requeridos']);
+
         $oferta_academica->update($data);
+        $oferta_academica->tiposDocumentoRequeridos()->sync($documentosRequeridos);
 
         return redirect()
             ->route('admin.institucional.ofertas.index')
