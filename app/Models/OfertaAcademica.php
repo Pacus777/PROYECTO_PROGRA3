@@ -82,22 +82,31 @@ class OfertaAcademica extends Model
     {
         $ahora = now();
 
-        return $query
-            ->where('fecha_inicio_postulacion_oac', '<=', $ahora)
-            ->where('fecha_fin_postulacion_oac', '>=', $ahora);
+        return $query->whereHas('gestion', function (Builder $q) use ($ahora) {
+            $q->where('fecha_inicio_postulacion_ges', '<=', $ahora)
+              ->where('fecha_fin_postulacion_ges', '>=', $ahora);
+        });
     }
 
     public function estaAbiertaParaPostulacion(): bool
     {
+        if (!$this->gestion || !$this->gestion->fecha_inicio_postulacion_ges || !$this->gestion->fecha_fin_postulacion_ges) {
+            return false;
+        }
+
         return now()->betweenIncluded(
-            $this->fecha_inicio_postulacion_oac,
-            $this->fecha_fin_postulacion_oac
+            $this->gestion->fecha_inicio_postulacion_ges,
+            $this->gestion->fecha_fin_postulacion_ges
         );
     }
 
     public function estadoConvocatoria(): string
     {
-        if (now()->lt($this->fecha_inicio_postulacion_oac)) {
+        if (!$this->gestion || !$this->gestion->fecha_inicio_postulacion_ges || !$this->gestion->fecha_fin_postulacion_ges) {
+            return 'cerrada';
+        }
+
+        if (now()->lt($this->gestion->fecha_inicio_postulacion_ges)) {
             return 'proxima';
         }
 

@@ -16,7 +16,7 @@ class StoreGestionRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        foreach (['fecha_ini_ges', 'fecha_fin_ges'] as $field) {
+        foreach (['fecha_ini_ges', 'fecha_fin_ges', 'fecha_inicio_postulacion_ges', 'fecha_fin_postulacion_ges'] as $field) {
             if ($this->input($field) === '') {
                 $this->merge([$field => null]);
             }
@@ -36,6 +36,8 @@ class StoreGestionRequest extends FormRequest
             'nombre_ges' => ['required', 'string', 'max:32'],
             'fecha_ini_ges' => ['nullable', 'date'],
             'fecha_fin_ges' => ['nullable', 'date'],
+            'fecha_inicio_postulacion_ges' => ['nullable', 'date'],
+            'fecha_fin_postulacion_ges' => ['nullable', 'date'],
             'activa_ges' => ['boolean'],
         ];
     }
@@ -46,12 +48,15 @@ class StoreGestionRequest extends FormRequest
             $ini = $this->input('fecha_ini_ges');
             $fin = $this->input('fecha_fin_ges');
 
-            if (! $ini || ! $fin) {
-                return;
+            if ($ini && $fin && Carbon::parse($fin)->lt(Carbon::parse($ini))) {
+                $validator->errors()->add('fecha_fin_ges', 'La fecha fin no puede ser menor que la fecha inicio.');
             }
 
-            if (Carbon::parse($fin)->lt(Carbon::parse($ini))) {
-                $validator->errors()->add('fecha_fin_ges', 'La fecha fin no puede ser menor que la fecha inicio.');
+            $iniPos = $this->input('fecha_inicio_postulacion_ges');
+            $finPos = $this->input('fecha_fin_postulacion_ges');
+
+            if ($iniPos && $finPos && Carbon::parse($finPos)->lt(Carbon::parse($iniPos))) {
+                $validator->errors()->add('fecha_fin_postulacion_ges', 'La fecha fin de postulación no puede ser menor que la fecha inicio de postulación.');
             }
         });
     }

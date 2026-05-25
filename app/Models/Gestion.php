@@ -15,6 +15,8 @@ class Gestion extends Model
         'nombre_ges',
         'fecha_ini_ges',
         'fecha_fin_ges',
+        'fecha_inicio_postulacion_ges',
+        'fecha_fin_postulacion_ges',
         'activa_ges',
     ];
 
@@ -23,6 +25,8 @@ class Gestion extends Model
         return [
             'fecha_ini_ges' => 'date',
             'fecha_fin_ges' => 'date',
+            'fecha_inicio_postulacion_ges' => 'datetime',
+            'fecha_fin_postulacion_ges' => 'datetime',
             'activa_ges' => 'boolean',
         ];
     }

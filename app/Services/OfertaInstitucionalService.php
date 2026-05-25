@@ -81,6 +81,12 @@ final class OfertaInstitucionalService
             $data['id_niv_oac'] = (int) $curso->id_niv_cur;
         }
 
+        $gestion = Gestion::query()->find((int) ($data['id_ges_oac'] ?? 0));
+        if ($gestion !== null) {
+            $data['fecha_inicio_postulacion_oac'] = $gestion->fecha_inicio_postulacion_ges;
+            $data['fecha_fin_postulacion_oac'] = $gestion->fecha_fin_postulacion_ges;
+        }
+
         return $data;
     }
 

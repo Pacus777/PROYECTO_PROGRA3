@@ -29,6 +29,8 @@ class GestionService
                 'nombre_ges',
                 'fecha_ini_ges',
                 'fecha_fin_ges',
+                'fecha_inicio_postulacion_ges',
+                'fecha_fin_postulacion_ges',
                 'activa_ges',
             ])->all();
 
@@ -51,6 +53,8 @@ class GestionService
                 'nombre_ges',
                 'fecha_ini_ges',
                 'fecha_fin_ges',
+                'fecha_inicio_postulacion_ges',
+                'fecha_fin_postulacion_ges',
                 'activa_ges',
             ])->all();
 

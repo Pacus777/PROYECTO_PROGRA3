@@ -25,8 +25,8 @@ class UpdateOfertaAcademicaRequest extends FormRequest
             'id_par_oac' => ['required', 'integer', 'exists:paralelo,id_par'],
             'descripcion_oac' => ['nullable', 'string', 'max:255'],
 
-            'fecha_inicio_postulacion_oac' => ['required', 'date'],
-            'fecha_fin_postulacion_oac' => ['required', 'date', 'after:fecha_inicio_postulacion_oac'],
+            'fecha_inicio_postulacion_oac' => ['nullable', 'date'],
+            'fecha_fin_postulacion_oac' => ['nullable', 'date'],
 
             'documentos_requeridos' => ['nullable', 'array'],
             'documentos_requeridos.*' => ['integer', 'distinct', 'exists:tipo_documento,id_tdo'],

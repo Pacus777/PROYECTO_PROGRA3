@@ -30,16 +30,34 @@
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                    <label for="fecha_ini_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Fecha inicio</label>
+                    <label for="fecha_ini_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Fecha inicio gestión</label>
                     <input type="date" name="fecha_ini_ges" id="fecha_ini_ges" value="{{ old('fecha_ini_ges', optional($gestion->fecha_ini_ges)->format('Y-m-d')) }}"
                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
                     @error('fecha_ini_ges')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label for="fecha_fin_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Fecha fin</label>
+                    <label for="fecha_fin_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Fecha fin gestión</label>
                     <input type="date" name="fecha_fin_ges" id="fecha_fin_ges" value="{{ old('fecha_fin_ges', optional($gestion->fecha_fin_ges)->format('Y-m-d')) }}"
                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
                     @error('fecha_fin_ges')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-650 mb-3">Cronograma Global de Postulaciones</h3>
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="fecha_inicio_postulacion_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Inicio de postulación (Nacional)</label>
+                        <input type="datetime-local" name="fecha_inicio_postulacion_ges" id="fecha_inicio_postulacion_ges" value="{{ old('fecha_inicio_postulacion_ges', optional($gestion->fecha_inicio_postulacion_ges)->format('Y-m-d\TH:i')) }}"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        @error('fecha_inicio_postulacion_ges')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="fecha_fin_postulacion_ges" class="mb-1.5 block text-xs font-semibold text-slate-600 uppercase tracking-wide">Cierre de postulación (Nacional)</label>
+                        <input type="datetime-local" name="fecha_fin_postulacion_ges" id="fecha_fin_postulacion_ges" value="{{ old('fecha_fin_postulacion_ges', optional($gestion->fecha_fin_postulacion_ges)->format('Y-m-d\TH:i')) }}"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        @error('fecha_fin_postulacion_ges')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+                    </div>
                 </div>
             </div>
 

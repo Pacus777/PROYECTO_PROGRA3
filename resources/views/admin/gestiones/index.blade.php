@@ -25,8 +25,8 @@
                 <thead class="border-b border-slate-100 bg-slate-50 text-left">
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Nombre</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Inicio</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Fin</th>
+                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Período Gestión</th>
+                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Postulación (Nacional)</th>
                         <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Estado</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">Acciones</th>
                     </tr>
@@ -34,9 +34,28 @@
                 <tbody>
                     @forelse($gestiones as $gestion)
                         <tr class="border-b border-slate-50 transition hover:bg-indigo-50/30 last:border-0">
-                            <td class="px-6 py-4 font-medium text-slate-900">{{ $gestion->nombre_ges }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $gestion->fecha_ini_ges?->format('Y-m-d') ?? '—' }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $gestion->fecha_fin_ges?->format('Y-m-d') ?? '—' }}</td>
+                            <td class="px-6 py-4 font-semibold text-slate-900">{{ $gestion->nombre_ges }}</td>
+                            <td class="px-6 py-4 text-slate-600 text-xs">
+                                <span>{{ $gestion->fecha_ini_ges?->format('d/m/Y') ?? '—' }}</span>
+                                <span class="mx-1 text-slate-300">al</span>
+                                <span>{{ $gestion->fecha_fin_ges?->format('d/m/Y') ?? '—' }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 text-xs">
+                                @if($gestion->fecha_inicio_postulacion_ges && $gestion->fecha_fin_postulacion_ges)
+                                    <div class="flex flex-col gap-0.5">
+                                        <div class="flex items-center gap-1.5 text-indigo-750 font-medium">
+                                            <span class="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+                                            <span>Ini: {{ $gestion->fecha_inicio_postulacion_ges->format('d/m/Y H:i') }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 text-slate-500">
+                                            <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                            <span>Fin: {{ $gestion->fecha_fin_postulacion_ges->format('d/m/Y H:i') }}</span>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-slate-400 italic">No configurado</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 @if($gestion->activa_ges)
                                     <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Activa</span>
@@ -45,7 +64,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="{{ route('admin.gestiones.edit', $gestion) }}" class="mr-1 inline-flex rounded-lg bg-slate-100 p-2 text-slate-500 transition hover:bg-indigo-100 hover:text-indigo-600">Editar</a>
+                                <a href="{{ route('admin.gestiones.edit', $gestion) }}" class="mr-1 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-indigo-100 hover:text-indigo-650">Editar</a>
                                 <form method="POST" action="{{ route('admin.gestiones.destroy', $gestion) }}" class="inline" onsubmit="return confirm('¿Eliminar esta gestión?');">
                                     @csrf
                                     @method('DELETE')

@@ -8,28 +8,39 @@
 
     @include('partials.favicon')
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css'])
     @stack('styles')
 
     <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+
         .custom-scrollbar {
             scrollbar-width: thin;
-            scrollbar-color: #6366f1 #eef2ff;
+            scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
         }
 
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #eef2ff;
-            border-radius: 999px;
+            background: transparent;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #6366f1;
+            background: rgba(99, 102, 241, 0.25);
             border-radius: 999px;
-            border: 2px solid #eef2ff;
+            transition: background 0.2s ease;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.45);
         }
 
         @keyframes fadeInUp {
@@ -66,7 +77,7 @@
         }
     </style>
 </head>
-<body class="bg-[#F5F7FF] text-[#1E1B4B] antialiased">
+<body class="bg-[#EEF0F6] text-[#1E1B4B] antialiased">
 @php
     /** @var \App\Models\Usuario|null $dashboardUser */
     $dashboardUserId = session('web_usuario_id');
