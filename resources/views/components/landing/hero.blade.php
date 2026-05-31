@@ -20,8 +20,8 @@
                 </p>
 
                 <div class="mt-10 flex flex-wrap gap-4">
-                    <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-300/50 hover:scale-105 active:scale-95 transition-transform">Ingresar como tutor →</a>
-                    <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold border-2 border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600 transition-all">Iniciar sesión</a>
+                    <a href="{{ route('colegios.index') }}" class="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-lg shadow-blue-300/50 hover:scale-105 active:scale-95 transition-transform">Ver colegios y postular →</a>
+                    <a href="{{ route('login.show') }}" class="px-8 py-4 rounded-xl text-base font-semibold border-2 border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600 transition-all">Ya tengo cuenta</a>
                 </div>
 
                 <div class="mt-8 flex flex-wrap gap-6 text-sm font-medium text-slate-600">

@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    public function show(): View
+    public function show(Request $request): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'redirect' => $this->redirectSeguro($request->query('redirect')),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -42,7 +44,25 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $request->session()->put('web_usuario_id', $usuario->id_usu);
 
+        $redirect = $this->redirectSeguro($request->input('redirect'));
+        if ($redirect !== null) {
+            return redirect()->to($redirect);
+        }
+
         return redirect()->route('dashboard');
+    }
+
+    private function redirectSeguro(mixed $url): ?string
+    {
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+
+        if (! str_starts_with($url, url('/'))) {
+            return null;
+        }
+
+        return $url;
     }
 
     public function destroy(Request $request): RedirectResponse

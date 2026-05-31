@@ -16,6 +16,13 @@ class UnidadEducativa extends Model
         'nombre_ued',
         'codigo_ued',
         'direccion_ued',
+        'descripcion_ued',
+        'telefono_ued',
+        'correo_ued',
+        'turno_ued',
+        'niveles_ued',
+        'imagen_portada_ued',
+        'galeria_ued',
         'lat_ued',
         'lng_ued',
         'id_mun_ued',
@@ -27,7 +34,37 @@ class UnidadEducativa extends Model
         return [
             'lat_ued' => 'float',
             'lng_ued' => 'float',
+            'galeria_ued' => 'array',
         ];
+    }
+
+    /** @return list<string> */
+    public function fotosGaleria(): array
+    {
+        $fotos = is_array($this->galeria_ued) ? $this->galeria_ued : [];
+
+        return array_values(array_filter($fotos, fn ($url) => is_string($url) && $url !== ''));
+    }
+
+    public function urlPortada(): ?string
+    {
+        $portada = $this->imagen_portada_ued;
+        if (is_string($portada) && $portada !== '') {
+            return $portada;
+        }
+
+        $galeria = $this->fotosGaleria();
+
+        return $galeria[0] ?? null;
+    }
+
+    public function tienePerfilPublico(): bool
+    {
+        return ($this->descripcion_ued ?? '') !== ''
+            || $this->urlPortada() !== null
+            || $this->fotosGaleria() !== []
+            || ($this->telefono_ued ?? '') !== ''
+            || ($this->correo_ued ?? '') !== '';
     }
 
     public function municipio(): BelongsTo

@@ -9,6 +9,7 @@ use App\Models\Criterio;
 use App\Models\EstadoPostulacion;
 use App\Models\Postulacion;
 use App\Services\PostulacionInstitucionalService;
+use App\Services\ProximidadEvaluacionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class PostulacionController extends BaseInstitutionalController
 {
     public function __construct(
         private readonly PostulacionInstitucionalService $service,
+        private readonly ProximidadEvaluacionService $proximidad,
     ) {}
 
     public function index(Request $request): View
@@ -69,11 +71,55 @@ class PostulacionController extends BaseInstitutionalController
         $estados = EstadoPostulacion::query()->orderBy('nombre_ept')->get();
         $criterios = Criterio::query()->orderBy('nombre_cri')->get();
 
+        $proximidadPreview = null;
+        $est = $postulacion->estudiante;
+        $ue = $postulacion->ofertaAcademica?->unidadEducativa;
+        if ($est?->lat_est && $est?->lng_est && $ue?->lat_ued && $ue?->lng_ued) {
+            $proximidadPreview = $this->proximidad->preview(
+                (float) $est->lat_est,
+                (float) $est->lng_est,
+                (float) $ue->lat_ued,
+                (float) $ue->lng_ued,
+            );
+        }
+
         return view('admin.institucional.postulaciones.show', compact(
             'postulacion',
             'estados',
             'criterios',
+            'proximidadPreview',
         ));
+    }
+
+    public function calcularProximidad(Request $request, Postulacion $postulacion): RedirectResponse
+    {
+        $unidadId = $this->unidadId($request);
+        $postulacion->loadMissing('ofertaAcademica');
+        $this->assertPostulacionBelongsToUnidad($postulacion, $unidadId);
+
+        $resultado = $this->proximidad->calcularParaPostulacion($postulacion);
+
+        if ($resultado === null || ! ($resultado['ok'] ?? false)) {
+            return back()->with('error', $resultado['motivo'] ?? 'No se pudo calcular la proximidad.');
+        }
+
+        $this->registrarActividad($request, 'evaluacion', (int) ($resultado['evaluacion_id'] ?? 0), 'evaluacion', [
+            'descripcion' => sprintf(
+                'Proximidad A*: %.2f km → puntaje %.1f',
+                $resultado['distancia_km'] ?? 0,
+                $resultado['puntaje'] ?? 0,
+            ),
+            'url' => route('admin.institucional.postulaciones.show', $postulacion),
+        ]);
+
+        return back()->with(
+            'success',
+            sprintf(
+                'Proximidad calculada con A*: %.2f km, puntaje %.1f/100 en criterio Distancia domicilio.',
+                $resultado['distancia_km'] ?? 0,
+                $resultado['puntaje'] ?? 0,
+            ),
+        );
     }
 
     public function update(UpdatePostulacionRequest $request, Postulacion $postulacion): RedirectResponse

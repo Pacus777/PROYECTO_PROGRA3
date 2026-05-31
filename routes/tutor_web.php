@@ -19,6 +19,8 @@ Route::middleware(['web.auth', 'web.role:tutor'])
 
         Route::get('/estudiantes', [TutorEstudianteController::class, 'index'])->name('estudiantes.index');
         Route::post('/estudiantes', [TutorEstudianteController::class, 'store'])->name('estudiantes.store');
+        Route::get('/estudiantes/{estudiante}/domicilio', [TutorEstudianteController::class, 'editDomicilio'])->name('estudiantes.domicilio.edit');
+        Route::put('/estudiantes/{estudiante}/domicilio', [TutorEstudianteController::class, 'updateDomicilio'])->name('estudiantes.domicilio.update');
         Route::delete('/estudiantes/{estudiante}', [TutorEstudianteController::class, 'destroy'])->name('estudiantes.destroy');
 
         Route::get('/postulaciones', [TutorPostulacionController::class, 'index'])->name('postulaciones.index');

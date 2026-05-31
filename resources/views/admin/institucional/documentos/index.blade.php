@@ -36,7 +36,27 @@
                 'observado'  => 'bg-blue-50 text-blue-700',
                 'rechazado'  => 'bg-rose-50 text-rose-700',
             ];
+            $ocrEstadoClasses = [
+                'pendiente'   => 'bg-amber-50 text-amber-700',
+                'procesando'  => 'bg-blue-50 text-blue-700',
+                'completado'  => 'bg-emerald-50 text-emerald-700',
+                'error'       => 'bg-rose-50 text-rose-700',
+                'omitido'     => 'bg-slate-100 text-slate-600',
+            ];
         @endphp
+
+        @if(!($ocrMotores['windows'] ?? false) && !($ocrMotores['tesseract'] ?? false) && !($ocrMotores['openai'] ?? false))
+            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+                <p class="font-semibold">OCR sin motor configurado</p>
+                <p class="mt-1 text-amber-800">
+                    En <strong>Windows 10/11</strong> el sistema usa OCR nativo automáticamente.
+                    También puede instalar <strong>Tesseract</strong>
+                    (<code class="rounded bg-white px-1">winget install UB-Mannheim.TesseractOCR</code>)
+                    o configurar <strong>OPENAI_API_KEY</strong> en <code class="rounded bg-white px-1">.env</code>.
+                    Luego ejecute <code class="rounded bg-white px-1">php artisan ocr:process-pending</code> o use «Reintentar OCR» en cada documento.
+                </p>
+            </div>
+        @endif
 
         <x-institucional.panel module="documentos" title="Documentos de postulación">
             @if($documentos->isEmpty())
@@ -74,7 +94,8 @@
                                         : '—';
 
                                     $estadoClass = $estadoClasses[$doc->estado_doc] ?? 'bg-slate-100 text-slate-600';
-                                    $ocrClass = $estadoClasses[$doc->procesamientoOcr?->estado_poc] ?? 'bg-slate-100 text-slate-600';
+                                    $ocrEstado = $doc->procesamientoOcr?->estado_poc ?? '—';
+                                    $ocrClass = $ocrEstadoClasses[$ocrEstado] ?? 'bg-slate-100 text-slate-600';
                                 @endphp
 
                                 <tr class="transition hover:bg-slate-50">
@@ -121,8 +142,32 @@
 
                                     <td class="px-5 py-3">
                                         <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $ocrClass }}">
-                                            {{ $doc->procesamientoOcr?->estado_poc ?? '—' }}
+                                            {{ $ocrEstado }}
                                         </span>
+                                        @if($doc->procesamientoOcr?->estado_poc === 'completado')
+                                            <a href="{{ route('admin.institucional.documentos.show', $doc) }}"
+                                               class="mt-1 block text-xs font-semibold text-indigo-600 hover:underline">
+                                                Ver texto OCR
+                                            </a>
+                                        @elseif($doc->procesamientoOcr?->estado_poc === 'error')
+                                            @php
+                                                $ocrError = $doc->procesamientoOcr->texto_extraido_poc ?? 'Error de OCR';
+                                                $ocrErrorCorto = \Illuminate\Support\Str::limit($ocrError, 120);
+                                            @endphp
+                                            <p class="mt-1 max-w-[14rem] text-[11px] leading-snug text-rose-600" title="{{ $ocrError }}">
+                                                {{ $ocrErrorCorto }}
+                                            </p>
+                                            <form method="POST" action="{{ route('admin.institucional.documentos.ocr', $doc) }}" class="mt-1">
+                                                @csrf
+                                                <button type="submit" class="text-xs font-semibold text-indigo-600 hover:underline">
+                                                    Reintentar OCR
+                                                </button>
+                                            </form>
+                                            <a href="{{ route('admin.institucional.documentos.show', $doc) }}"
+                                               class="mt-1 block text-xs text-slate-500 hover:underline">
+                                                Ver detalle
+                                            </a>
+                                        @endif
                                     </td>
 
                                     <td class="px-5 py-3 text-right">

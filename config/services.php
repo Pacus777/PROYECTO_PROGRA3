@@ -39,6 +39,10 @@ return [
         'maps_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'maps' => [
+        'provider' => env('MAPS_PROVIDER', 'osm'),
+    ],
+
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
         'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),

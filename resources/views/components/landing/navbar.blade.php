@@ -6,7 +6,7 @@
 >
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="h-20 flex items-center justify-between gap-4">
-            <a href="#inicio" class="flex items-center gap-2">
+            <a href="{{ route('home') }}" class="flex items-center gap-2">
                 <svg class="w-7 h-7 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 18h16M6 15l6-8 6 8M9 15v3m6-3v3" />
                 </svg>
@@ -15,6 +15,7 @@
 
             <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600">
                 <a href="#inicio" class="hover:text-blue-600 transition-colors duration-200">Inicio</a>
+                <a href="{{ route('colegios.index') }}" class="hover:text-blue-600 transition-colors duration-200">Colegios</a>
                 <a href="#como-funciona" class="hover:text-blue-600 transition-colors duration-200">Cómo funciona</a>
                 <a href="#beneficios" class="hover:text-blue-600 transition-colors duration-200">Beneficios</a>
                 <a href="#contacto" class="hover:text-blue-600 transition-colors duration-200">Contacto</a>
@@ -22,7 +23,7 @@
 
             <div class="hidden lg:flex items-center gap-3">
                 <a href="{{ route('login.show') }}" class="px-5 py-2.5 rounded-xl border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition-colors duration-200">Iniciar sesión</a>
-                <a href="{{ route('login.show') }}" class="px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold shadow-lg shadow-blue-200 hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200">Acceso tutor</a>
+                <a href="{{ route('colegios.index') }}" class="px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold shadow-lg shadow-blue-200 hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200">Registrarme</a>
             </div>
 
             <button @click="mobileOpen = !mobileOpen" class="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-700" aria-label="Abrir menú">
@@ -44,12 +45,13 @@
     >
         <div class="max-w-7xl mx-auto px-6 py-4 space-y-3 text-slate-700">
             <a @click="mobileOpen=false" href="#inicio" class="block">Inicio</a>
+            <a @click="mobileOpen=false" href="{{ route('colegios.index') }}" class="block">Colegios</a>
             <a @click="mobileOpen=false" href="#como-funciona" class="block">Cómo funciona</a>
             <a @click="mobileOpen=false" href="#beneficios" class="block">Beneficios</a>
             <a @click="mobileOpen=false" href="#contacto" class="block">Contacto</a>
             <div class="pt-3 flex flex-col gap-2">
                 <a href="{{ route('login.show') }}" class="text-center px-4 py-2.5 rounded-xl border border-blue-600 text-blue-600 font-semibold">Iniciar sesión</a>
-                <a href="{{ route('login.show') }}" class="text-center px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold">Acceso tutor</a>
+                <a href="{{ route('colegios.index') }}" @click="mobileOpen=false" class="text-center px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold">Registrarme</a>
             </div>
         </div>
     </div>

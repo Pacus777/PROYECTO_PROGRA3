@@ -78,7 +78,7 @@ class TutorDocumentoController extends Controller
 
         return redirect()
             ->route('tutor.postulaciones.show', $postulacion)
-            ->with('success', 'Documento subido correctamente. Quedará en revisión.');
+            ->with('success', 'Documento subido correctamente. El colegio lo revisará en cuanto el sistema termine de leer el archivo.');
     }
 
     public function destroy(Request $request, Documento $documento): RedirectResponse

@@ -14,16 +14,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css'])
+    @stack('styles')
+    <style>[x-cloak]{display:none!important}</style>
 </head>
 <body class="bg-[#F8FAFF] text-slate-900 font-sans antialiased">
 @yield('content')
 
 @stack('scripts')
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
+@include('partials.ui-global-actions')
 
 <script>
 document.addEventListener('alpine:init', () => {
-    // Controla estado del navbar (scroll + menú mobile).
     Alpine.data('navbarState', () => ({
         mobileOpen: false,
         scrolled: false,
@@ -36,7 +38,6 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
-    // Efecto de entrada por sección al entrar al viewport.
     Alpine.data('revealOnScroll', () => ({
         shown: false,
         init() {
@@ -51,7 +52,83 @@ document.addEventListener('alpine:init', () => {
             observer.observe(this.$el);
         }
     }));
+
+    Alpine.data('colegiosFilter', () => ({
+        q: '',
+        filtro: 'todos',
+        visible(el) {
+            const abierta = el.dataset.abierta === '1';
+            if (this.filtro === 'abiertas' && !abierta) return false;
+            const text = (el.dataset.search || '').toLowerCase();
+            const query = this.q.trim().toLowerCase();
+            if (query && !text.includes(query)) return false;
+            return true;
+        },
+    }));
+
+    Alpine.data('tutorRegistroWizard', (config = {}) => ({
+        open: false,
+        step: config.initialStep ?? 1,
+        totalSteps: 3,
+        stepLabels: ['Datos personales', 'Acceso', 'Estudiantes'],
+        rudes: config.rudes ?? [''],
+        get progress() {
+            return (this.step / this.totalSteps) * 100;
+        },
+        init() {
+            if (config.autoOpen) {
+                this.open = true;
+                document.body.style.overflow = 'hidden';
+            }
+        },
+        openModal() {
+            this.open = true;
+            this.step = 1;
+            document.body.style.overflow = 'hidden';
+        },
+        closeModal() {
+            this.open = false;
+            document.body.style.overflow = '';
+            if (window.location.search.includes('registro=1')) {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('registro');
+                window.history.replaceState({}, '', url.pathname + url.hash);
+            }
+        },
+        validateStep() {
+            const panel = this.$refs['step' + this.step];
+            if (!panel) return true;
+            const inputs = panel.querySelectorAll('input, select, textarea');
+            for (const input of inputs) {
+                if (input.offsetParent === null) continue;
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    return false;
+                }
+            }
+            return true;
+        },
+        nextStep() {
+            if (!this.validateStep()) return;
+            if (this.step < this.totalSteps) this.step++;
+        },
+        prevStep() {
+            if (this.step > 1) this.step--;
+        },
+        addRude() {
+            if (this.rudes.length < 8) this.rudes.push('');
+        },
+        removeRude(i) {
+            if (this.rudes.length > 1) this.rudes.splice(i, 1);
+        },
+        onSubmit(e) {
+            if (!this.validateStep()) {
+                e.preventDefault();
+            }
+        },
+    }));
 });
 </script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 </body>
 </html>

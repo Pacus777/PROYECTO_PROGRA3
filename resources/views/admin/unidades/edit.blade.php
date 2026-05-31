@@ -48,6 +48,48 @@
                 :lat="old('lat_ued', $unidad->lat_ued)"
                 :lng="old('lng_ued', $unidad->lng_ued)"
             />
+
+            <div class="rounded-xl border border-slate-100 bg-slate-50/80 p-4 space-y-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Perfil público (catálogo de colegios)</p>
+                <div>
+                    <label for="descripcion_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Descripción</label>
+                    <textarea name="descripcion_ued" id="descripcion_ued" rows="4"
+                              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">{{ old('descripcion_ued', $unidad->descripcion_ued) }}</textarea>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="telefono_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Teléfono</label>
+                        <input type="text" name="telefono_ued" id="telefono_ued" value="{{ old('telefono_ued', $unidad->telefono_ued) }}"
+                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label for="correo_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Correo</label>
+                        <input type="email" name="correo_ued" id="correo_ued" value="{{ old('correo_ued', $unidad->correo_ued) }}"
+                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label for="turno_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Turno</label>
+                        <input type="text" name="turno_ued" id="turno_ued" value="{{ old('turno_ued', $unidad->turno_ued) }}" placeholder="Ej: Mañana y Tarde"
+                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label for="niveles_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Niveles</label>
+                        <input type="text" name="niveles_ued" id="niveles_ued" value="{{ old('niveles_ued', $unidad->niveles_ued) }}" placeholder="Ej: Inicial, Primaria, Secundaria"
+                               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="imagen_portada_ued" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Imagen de portada (URL)</label>
+                    <input type="url" name="imagen_portada_ued" id="imagen_portada_ued" value="{{ old('imagen_portada_ued', $unidad->imagen_portada_ued) }}"
+                           class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="https://...">
+                </div>
+                <div>
+                    <label for="galeria_ued_text" class="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Galería de fotos (una URL por línea)</label>
+                    <textarea name="galeria_ued_text" id="galeria_ued_text" rows="4"
+                              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-mono text-xs"
+                              placeholder="https://ejemplo.com/foto1.jpg">{{ old('galeria_ued_text', implode("\n", $unidad->fotosGaleria())) }}</textarea>
+                </div>
+            </div>
         </div>
         <div class="mt-8 flex flex-wrap gap-3">
             <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">Actualizar</button>

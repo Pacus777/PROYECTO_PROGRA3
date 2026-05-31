@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Web\Tutor;
 
+use App\Models\Estudiante;
 use App\Models\OfertaAcademica;
 use App\Models\Postulacion;
 use App\Models\Tutor;
@@ -75,7 +76,7 @@ class StoreTutorPostulacionRequest extends FormRequest
             }
 
             /** @var OfertaAcademica|null $oferta */
-            $oferta = OfertaAcademica::query()->find($ofertaId);
+            $oferta = OfertaAcademica::query()->with('unidadEducativa')->find($ofertaId);
 
             if ($oferta === null) {
                 $v->errors()->add('id_oac_pos', 'La oferta académica seleccionada no existe.');
@@ -107,6 +108,22 @@ class StoreTutorPostulacionRequest extends FormRequest
 
             if ($prioridadRepetida) {
                 $v->errors()->add('prioridad_pos', 'Este estudiante ya tiene una postulación con esa prioridad en la misma gestión.');
+            }
+
+            $estudiante = Estudiante::query()->find($estudianteId);
+            if ($estudiante !== null && ! $estudiante->tieneDomicilioRegistrado()) {
+                $v->errors()->add(
+                    'id_est_pos',
+                    'Debe registrar el domicilio del estudiante en el mapa antes de postular (se usa para evaluar la cercanía al colegio).',
+                );
+            }
+
+            if ($oferta->unidadEducativa !== null
+                && ($oferta->unidadEducativa->lat_ued === null || $oferta->unidadEducativa->lng_ued === null)) {
+                $v->errors()->add(
+                    'id_oac_pos',
+                    'El colegio de esta oferta aún no tiene ubicación en el mapa. Contacte a la unidad educativa.',
+                );
             }
         });
     }

@@ -7,6 +7,8 @@
     'lng' => null,
     'readonly' => false,
     'pickerId' => null,
+    'searchLabel' => 'Ubicación de la unidad',
+    'searchPlaceholder' => 'Buscar calle, zona, barrio o ciudad en Bolivia…',
 ])
 
 @php
@@ -14,15 +16,21 @@
     $addressVal = old($addressName, $address);
     $latVal = old($latName, $lat);
     $lngVal = old($lngName, $lng);
-    $googleKey = config('services.google.maps_key');
+    $googleKey = config('maps.google_key') ?: config('services.google.maps_key');
+    $preferGoogle = (config('maps.provider') ?: 'osm') === 'google';
+    $useGoogle = $preferGoogle && filled($googleKey) && strlen(trim((string) $googleKey)) > 10;
     $hasCoords = $latVal !== null && $latVal !== '' && $lngVal !== null && $lngVal !== '';
+    $defaultLat = (float) config('maps.default_lat', -16.5);
+    $defaultLng = (float) config('maps.default_lng', -68.15);
     $config = [
         'pickerId' => $pickerId,
         'address' => $addressVal ?? '',
-        'lat' => $hasCoords ? (float) $latVal : -16.5,
-        'lng' => $hasCoords ? (float) $lngVal : -68.15,
+        'lat' => $hasCoords ? (float) $latVal : $defaultLat,
+        'lng' => $hasCoords ? (float) $lngVal : $defaultLng,
         'readonly' => (bool) $readonly,
-        'useGoogle' => filled($googleKey) && strlen(trim((string) $googleKey)) > 10,
+        'useGoogle' => $useGoogle,
+        'geocodeSearchUrl' => route('geocode.search'),
+        'geocodeReverseUrl' => route('geocode.reverse'),
     ];
 @endphp
 
@@ -34,6 +42,17 @@
     x-init="init()"
 >
     @unless($readonly)
+        @if($useGoogle)
+            <div class="border-b border-emerald-100 bg-emerald-50/80 px-4 py-2 text-xs text-emerald-900">
+                <span class="font-semibold">Google Maps</span> — motor de mapas activo.
+            </div>
+        @else
+            <div class="border-b border-teal-100 bg-teal-50/80 px-4 py-2 text-xs text-teal-900">
+                <span class="font-semibold">OpenStreetMap</span> — mapa gratuito y de código abierto. Busque la zona o calle, elija una opción y ajuste el marcador en el mapa si hace falta.
+            </div>
+        @endif
+    @endunless
+    @unless($readonly)
         <div class="border-b border-slate-100 bg-gradient-to-br from-slate-50 to-indigo-50/40 p-4 sm:p-5">
             <label for="{{ $pickerId }}-search" class="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
                 <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm">
@@ -42,26 +61,43 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                 </span>
-                Ubicación de la unidad
+                {{ $searchLabel }}
             </label>
-            <div class="relative">
+            <div class="relative flex gap-2">
                 <input
                     type="text"
                     id="{{ $pickerId }}-search"
                     x-ref="search"
                     autocomplete="off"
-                    placeholder="Buscar calle, zona, barrio o ciudad en Bolivia…"
-                    class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-sm shadow-sm transition focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    placeholder="{{ $searchPlaceholder }}"
+                    class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-4 text-sm shadow-sm transition focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                <span x-show="searching" x-cloak class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                <button type="button" @click="runSearchFromInput()"
+                        class="shrink-0 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                    Buscar
+                </button>
+                <span x-show="searching" x-cloak class="pointer-events-none absolute inset-y-0 right-[5.5rem] flex items-center pr-1">
                     <svg class="h-5 w-5 animate-spin text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
                 </span>
             </div>
+            <div x-show="showResults && searchResults.length" x-cloak
+                 class="relative z-20 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                <template x-for="(item, idx) in searchResults" :key="idx">
+                    <button type="button" @click="applySearchResult(item)"
+                            class="block w-full border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition last:border-b-0 hover:bg-indigo-50">
+                        <span x-text="item.label"></span>
+                        <span x-show="item.approximate" class="mt-0.5 block text-[11px] font-medium text-amber-700">Ubicación aproximada</span>
+                    </button>
+                </template>
+            </div>
+            <p x-show="searchMessage" x-cloak x-text="searchMessage"
+               class="mt-2 rounded-lg border px-3 py-2 text-xs leading-relaxed"
+               :class="searchResults.length ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-rose-200 bg-rose-50 text-rose-800'"></p>
             <p class="mt-2 text-xs leading-relaxed text-slate-500">
-                Escribe para buscar, haz clic en el mapa o arrastra el marcador azul para fijar el punto.
+                Escriba la dirección y pulse <strong>Buscar</strong>, o haga clic en el mapa y arrastre el marcador azul.
             </p>
         </div>
     @endunless
@@ -150,6 +186,17 @@
             .address-location-picker .leaflet-control-zoom a {
                 color: #4338ca !important;
             }
+            .pac-container {
+                z-index: 10050 !important;
+                font-family: inherit;
+                border-radius: 0.75rem;
+                margin-top: 4px;
+                box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
+            }
+            .pac-item {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
         </style>
     @endpush
     @push('scripts')
@@ -192,7 +239,7 @@
                 return window.__gmapsReady;
             }
 
-            function loadGoogleMapsWithTimeout(apiKey, maxMs = 3000) {
+            function loadGoogleMapsWithTimeout(apiKey, maxMs = 10000) {
                 return Promise.race([
                     loadGoogleMaps(apiKey),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Google Maps timeout')), maxMs)),
@@ -207,11 +254,16 @@
                     lng: config.lng ?? -68.15,
                     readonly: config.readonly ?? false,
                     useGoogle: config.useGoogle ?? false,
+                    geocodeSearchUrl: config.geocodeSearchUrl || '/geocode/search',
+                    geocodeReverseUrl: config.geocodeReverseUrl || '/geocode/reverse',
                     map: null,
                     marker: null,
                     autocomplete: null,
                     searchTimer: null,
                     searching: false,
+                    searchResults: [],
+                    searchMessage: '',
+                    showResults: false,
                     _wizardHandler: null,
                     _bootPromise: null,
                     mapProvider: null,
@@ -269,23 +321,24 @@
                             return;
                         }
                         try {
-                            await waitForLeaflet();
                             if (this.useGoogle) {
                                 try {
                                     await loadGoogleMapsWithTimeout(this.$root.dataset.googleKey);
                                     this.initGoogleMap(this.readonly);
                                     if (!this.readonly) {
                                         this.initGoogleAutocomplete();
+                                        this.bindAddressSearch();
                                     }
                                     this.mapProvider = 'google';
                                     return;
                                 } catch (e) {
-                                    /* OpenStreetMap */
+                                    console.warn('Google Maps no disponible, usando OpenStreetMap', e);
                                 }
                             }
+                            await waitForLeaflet();
                             this.initLeafletMap(this.readonly);
                             if (!this.readonly) {
-                                this.bindNominatimSearch();
+                                this.bindAddressSearch();
                             }
                             this.mapProvider = 'leaflet';
                         } catch (e) {
@@ -384,19 +437,190 @@
                     initGoogleAutocomplete() {
                         const input = this.$refs.search;
                         if (!input || !google.maps.places) return;
+                        const boliviaBounds = new google.maps.LatLngBounds(
+                            { lat: -22.9, lng: -69.6 },
+                            { lat: -9.7, lng: -57.5 },
+                        );
                         this.autocomplete = new google.maps.places.Autocomplete(input, {
                             componentRestrictions: { country: 'bo' },
-                            fields: ['formatted_address', 'geometry', 'name'],
+                            bounds: boliviaBounds,
+                            fields: ['formatted_address', 'geometry', 'name', 'address_components', 'types'],
                         });
                         this.autocomplete.addListener('place_changed', () => {
                             const place = this.autocomplete.getPlace();
                             if (!place.geometry?.location) return;
                             const lat = place.geometry.location.lat();
                             const lng = place.geometry.location.lng();
-                            const addr = place.formatted_address || place.name || input.value;
+                            const typed = (input.value || '').trim();
+                            const addr = typed || place.formatted_address || place.name || '';
                             this.setPosition(lat, lng, addr);
-                            this.map.setZoom(16);
+                            this.map.setZoom(17);
+                            this.showResults = false;
+                            this.searchMessage = '';
                         });
+                    },
+
+                    geocodeWithGoogle(query) {
+                        return new Promise((resolve) => {
+                            if (!window.google?.maps?.Geocoder) {
+                                resolve([]);
+                                return;
+                            }
+                            const geocoder = new google.maps.Geocoder();
+                            geocoder.geocode(
+                                {
+                                    address: query,
+                                    componentRestrictions: { country: 'BO' },
+                                    region: 'BO',
+                                },
+                                (results, status) => {
+                                    if (status !== 'OK' || !Array.isArray(results) || results.length === 0) {
+                                        resolve([]);
+                                        return;
+                                    }
+                                    resolve(results.slice(0, 5).map((row) => {
+                                        const loc = row.geometry.location;
+                                        const types = row.types || [];
+                                        const approximate = !types.includes('street_address')
+                                            && !types.includes('premise')
+                                            && !types.includes('subpremise')
+                                            && !types.includes('route');
+                                        return {
+                                            lat: loc.lat(),
+                                            lng: loc.lng(),
+                                            label: row.formatted_address || query,
+                                            approximate,
+                                            source: 'google',
+                                        };
+                                    }));
+                                },
+                            );
+                        });
+                    },
+
+                    async handleSearchResults(data, query) {
+                        this.searchResults = Array.isArray(data.results) ? data.results : [];
+                        if (this.searchResults.length === 0) {
+                            this.searchMessage = data.message || 'No encontramos esa dirección. Marque el punto en el mapa.';
+                            return;
+                        }
+                        if (this.searchResults.length === 1) {
+                            this.applySearchResult(this.searchResults[0]);
+                            if (data.message) {
+                                this.searchMessage = data.message;
+                            }
+                            return;
+                        }
+                        this.showResults = true;
+                        this.searchMessage = data.message || 'Elija la opción que más se acerque a la vivienda.';
+                    },
+
+                    bindAddressSearch() {
+                        const input = this.$refs.search;
+                        if (!input) return;
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                this.runSearchFromInput();
+                            }
+                        });
+                        input.addEventListener('input', () => {
+                            clearTimeout(this.searchTimer);
+                            this.showResults = false;
+                            const q = input.value.trim();
+                            if (q.length < 4) {
+                                this.searchMessage = '';
+                                return;
+                            }
+                            this.searchTimer = setTimeout(() => this.runSearch(q), 700);
+                        });
+                    },
+
+                    runSearchFromInput() {
+                        const q = (this.$refs.search?.value || '').trim();
+                        if (q.length < 3) {
+                            this.searchMessage = 'Escriba al menos 3 caracteres para buscar.';
+                            return;
+                        }
+                        this.runSearch(q);
+                    },
+
+                    async runSearch(query) {
+                        this.searching = true;
+                        this.searchMessage = '';
+                        this.showResults = false;
+                        try {
+                            if (this.mapProvider === 'google') {
+                                const googleHits = await this.geocodeWithGoogle(query);
+                                if (googleHits.length > 0) {
+                                    const precise = googleHits.filter((h) => !h.approximate);
+                                    await this.handleSearchResults({
+                                        results: precise.length > 0 ? precise : googleHits,
+                                        message: precise.length === 0
+                                            ? 'Ubicación aproximada. Arrastre el marcador hasta la casa exacta.'
+                                            : null,
+                                    }, query);
+                                    return;
+                                }
+                            }
+
+                            const url = this.geocodeSearchUrl + '?q=' + encodeURIComponent(query);
+                            const res = await fetch(url, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                credentials: 'same-origin',
+                            });
+                            if (!res.ok) {
+                                throw new Error('HTTP ' + res.status);
+                            }
+                            const data = await res.json();
+                            await this.handleSearchResults(data, query);
+                        } catch (e) {
+                            console.warn('Búsqueda de dirección no disponible', e);
+                            this.searchMessage = 'No se pudo buscar la dirección. Marque el punto manualmente en el mapa.';
+                        } finally {
+                            this.searching = false;
+                        }
+                    },
+
+                    applySearchResult(item) {
+                        if (!item) return;
+                        const typed = (this.$refs.search?.value || '').trim();
+                        this.setPosition(item.lat, item.lng, typed || item.label);
+                        this.showResults = false;
+                        if (item.approximate) {
+                            this.searchMessage = 'Ubicación aproximada. Arrastre el marcador azul hasta la casa exacta.';
+                        } else {
+                            this.searchMessage = '';
+                        }
+                        if (this.mapProvider === 'google' && this.map?.setZoom) {
+                            this.map.setZoom(17);
+                        } else if (this.map?.setView) {
+                            this.map.setView([item.lat, item.lng], 17);
+                        }
+                        this.refreshMapSize();
+                    },
+
+                    async reverseGeocodeServer(lat, lng) {
+                        try {
+                            const url = this.geocodeReverseUrl + '?lat=' + encodeURIComponent(lat) + '&lng=' + encodeURIComponent(lng);
+                            const res = await fetch(url, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                credentials: 'same-origin',
+                            });
+                            if (!res.ok) return;
+                            const data = await res.json();
+                            if (data.label) {
+                                this.address = data.label;
+                            }
+                        } catch (e) {
+                            /* ignore */
+                        }
                     },
 
                     reverseGeocodeGoogle(lat, lng) {
@@ -429,69 +653,14 @@
                             this.marker.on('dragend', () => {
                                 const p = this.marker.getLatLng();
                                 this.setPosition(p.lat, p.lng);
-                                this.reverseGeocodeNominatim(p.lat, p.lng);
+                                this.reverseGeocodeServer(p.lat, p.lng);
                             });
                             this.map.on('click', (e) => {
                                 this.setPosition(e.latlng.lat, e.latlng.lng);
-                                this.reverseGeocodeNominatim(e.latlng.lat, e.latlng.lng);
+                                this.reverseGeocodeServer(e.latlng.lat, e.latlng.lng);
                             });
                         }
                         this.refreshMapSize();
-                    },
-
-                    bindNominatimSearch() {
-                        const input = this.$refs.search;
-                        if (!input) return;
-                        input.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const q = input.value.trim();
-                                if (q.length >= 3) {
-                                    this.searchNominatim(q);
-                                }
-                            }
-                        });
-                        input.addEventListener('input', () => {
-                            clearTimeout(this.searchTimer);
-                            const q = input.value.trim();
-                            if (q.length < 3) return;
-                            this.searchTimer = setTimeout(() => this.searchNominatim(q), 500);
-                        });
-                    },
-
-                    async searchNominatim(query) {
-                        this.searching = true;
-                        try {
-                            const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=bo&q=' + encodeURIComponent(query);
-                            const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
-                            const data = await res.json();
-                            if (data[0]) {
-                                const lat = parseFloat(data[0].lat);
-                                const lng = parseFloat(data[0].lon);
-                                this.setPosition(lat, lng, data[0].display_name);
-                                if (this.map?.setView) {
-                                    this.map.setView([lat, lng], 16);
-                                }
-                                this.refreshMapSize();
-                            }
-                        } catch (e) {
-                            console.warn('Búsqueda de dirección no disponible', e);
-                        } finally {
-                            this.searching = false;
-                        }
-                    },
-
-                    async reverseGeocodeNominatim(lat, lng) {
-                        try {
-                            const url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng;
-                            const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
-                            const data = await res.json();
-                            if (data.display_name) {
-                                this.address = data.display_name;
-                            }
-                        } catch (e) {
-                            /* ignore */
-                        }
                     },
 
                     hasPreciseCoords() {

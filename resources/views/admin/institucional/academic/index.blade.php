@@ -13,7 +13,7 @@
         $selectClass = $inputClass;
         $pageSubtitle = $unidad
             ? 'Organice el catálogo de '.$unidad->nombre_ued.($unidad->codigo_ued ? ' ('.$unidad->codigo_ued.')' : '').' para crear ofertas de admisión claras y consistentes.'
-            : 'Defina niveles, cursos y paralelos antes de publicar ofertas.';
+            : 'Los niveles y grados ya vienen del catálogo nacional. Registre los paralelos de su unidad antes de publicar ofertas.';
     @endphp
 
     <x-institucional.page module="academic" title="Gestión académica" :subtitle="$pageSubtitle">
@@ -36,7 +36,7 @@
 
         <div
             x-data="{
-                tab: @js(old('nombre_par') || old('id_cur_par') ? 'paralelo' : (old('nombre_cur') || old('id_niv_cur') ? 'curso' : 'nivel')),
+                tab: @js(old('nombre_niv') ? 'nivel' : (old('nombre_cur') || old('id_niv_cur') ? 'curso' : 'paralelo')),
                 editNivel: null,
                 editCurso: null,
                 editParalelo: null
@@ -54,8 +54,8 @@
                             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
                                 <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/></svg>
                             </div>
-                            <p class="mt-4 text-base font-semibold text-slate-700">Comience creando un nivel</p>
-                            <p class="mt-2 text-sm text-slate-500">Use el formulario «Agregar elemento» de arriba para registrar el primer nivel.</p>
+                            <p class="mt-4 text-base font-semibold text-slate-700">Catálogo no disponible</p>
+                            <p class="mt-2 text-sm text-slate-500">Ejecute las migraciones y seeders del sistema, o contacte al administrador general.</p>
                         </div>
                     @else
                         @include('admin.institucional.academic._catalogo-cards')
