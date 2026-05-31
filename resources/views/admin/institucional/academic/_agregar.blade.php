@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-4 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-base font-semibold text-slate-900">Agregar elemento</h2>
-            <p class="mt-0.5 text-xs text-slate-500">Registre en orden: nivel, curso y paralelo.</p>
+            <p class="mt-0.5 text-xs text-slate-500">Inicial, Primaria y Secundaria con sus grados ya están en el catálogo. Solo registre los paralelos de su unidad (A, B, C…).</p>
         </div>
         <div class="flex rounded-xl border border-slate-200 bg-slate-50 p-1 sm:min-w-[280px]">
             @foreach([

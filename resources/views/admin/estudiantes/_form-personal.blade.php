@@ -25,7 +25,12 @@
         <div>
             <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">CI</label>
             <input type="text" name="ci_per" value="{{ old('ci_per', $p->ci_per ?? '') }}"
-                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                   inputmode="numeric" pattern="[0-9]{8,20}" minlength="8" maxlength="20"
+                   placeholder="Solo números, mínimo 8 dígitos"
+                   title="Ingrese solo números, mínimo 8 dígitos"
+                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            @error('ci_per')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+            <p class="mt-1 text-xs text-slate-500">Opcional. Solo cifras, sin letras ni guiones.</p>
         </div>
     </div>
 
@@ -43,19 +48,6 @@
                 <option value="M" @selected(old('genero_per', $p->genero_per ?? '') === 'M')>Masculino</option>
                 <option value="F" @selected(old('genero_per', $p->genero_per ?? '') === 'F')>Femenino</option>
             </select>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Correo</label>
-            <input type="email" name="correo_per" value="{{ old('correo_per', $p->correo_per ?? '') }}"
-                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
-        </div>
-        <div>
-            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Teléfono</label>
-            <input type="text" name="telefono_per" value="{{ old('telefono_per', $p->telefono_per ?? '') }}"
-                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300">
         </div>
     </div>
 </div>

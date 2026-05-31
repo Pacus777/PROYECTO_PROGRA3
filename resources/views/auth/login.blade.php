@@ -137,6 +137,9 @@
                           :class="shakeForm ? 'anim-shake' : ''"
                           @submit="if (!$refs.correo.value || !$refs.password.value) { shakeForm = true; setTimeout(() => shakeForm = false, 420); $event.preventDefault(); } else { loading = true; }">
                         @csrf
+                        @if(!empty($redirect))
+                            <input type="hidden" name="redirect" value="{{ $redirect }}">
+                        @endif
 
                         <div x-data="{ focused: false }">
                             <label for="correo_usu" :class="focused ? 'text-blue-600' : 'text-slate-600'" class="block text-xs font-semibold uppercase tracking-wide mb-2 transition-colors">Correo electrónico</label>
@@ -196,8 +199,8 @@
                     </button>
 
                     <p class="mt-8 text-center text-sm text-slate-500">
-                        ¿Eres tutor o apoderado?
-                        <a href="#" class="text-blue-600 font-semibold hover:underline ml-1">Solicita tu cuenta</a>
+                        ¿Aún no tienes cuenta?
+                        <a href="{{ route('colegios.index') }}" class="text-blue-600 font-semibold hover:underline ml-1">Regístrate desde un colegio</a>
                     </p>
                 </div>
             </main>

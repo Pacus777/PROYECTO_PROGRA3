@@ -11,7 +11,9 @@ use App\Models\EstadoPostulacion;
 use App\Models\Estudiante;
 use App\Models\OfertaAcademica;
 use App\Models\Postulacion;
+use App\Models\UnidadEducativa;
 use App\Services\PostulacionService;
+use App\Services\ProximidadEvaluacionService;
 use App\Services\TutorCupoService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -24,6 +26,7 @@ class TutorPostulacionController extends Controller
     public function __construct(
         private readonly PostulacionService $postulacionService,
         private readonly TutorCupoService $tutorCupoService,
+        private readonly ProximidadEvaluacionService $proximidad,
     ) {}
 
     public function index(Request $request): View
@@ -54,7 +57,7 @@ class TutorPostulacionController extends Controller
         return view('tutor.postulaciones.index', compact('postulaciones', 'estados'));
     }
 
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
         $estudianteIds = $this->tutorEstudianteIds($request);
 
@@ -66,18 +69,51 @@ class TutorPostulacionController extends Controller
                 ->orderBy('id_est')
                 ->get();
 
-        $ofertas = OfertaAcademica::query()
+        $ofertasQuery = OfertaAcademica::query()
             ->abiertasParaPostulacion()
-            ->with(['gestion', 'nivel', 'curso', 'paralelo', 'unidadEducativa'])
-            ->orderByDesc('id_oac')
-            ->get();
+            ->with(['gestion', 'nivel', 'curso', 'paralelo', 'unidadEducativa']);
 
-        if ($ofertas->isEmpty()) {
-            return view('tutor.postulaciones.create', compact('estudiantes', 'ofertas'))
-                ->with('error', 'No hay ofertas abiertas para postulación en este momento.');
+        $unidadSeleccionada = null;
+        if ($request->filled('colegio')) {
+            $unidadSeleccionada = UnidadEducativa::query()
+                ->where('codigo_ued', (string) $request->query('colegio'))
+                ->first();
+
+            if ($unidadSeleccionada !== null) {
+                $ofertasQuery->where('id_ued_oac', $unidadSeleccionada->id_ued);
+            }
         }
 
-        return view('tutor.postulaciones.create', compact('estudiantes', 'ofertas'));
+        $ofertas = $ofertasQuery->orderByDesc('id_oac')->get();
+        $ofertaPreseleccionada = $request->integer('oac') ?: null;
+
+        $estudiantesSinDomicilio = $estudiantes
+            ->filter(fn (Estudiante $e) => ! $e->tieneDomicilioRegistrado())
+            ->values();
+
+        if ($estudiantesSinDomicilio->isNotEmpty()) {
+            $est = $estudiantesSinDomicilio->first();
+
+            return redirect()
+                ->route('tutor.estudiantes.domicilio.edit', [
+                    'estudiante' => $est,
+                    'return' => route('tutor.postulaciones.create', $request->query()),
+                ])
+                ->with('warning', 'Antes de postular, indique en el mapa dónde vive el estudiante.');
+        }
+
+        if ($ofertas->isEmpty()) {
+            return view('tutor.postulaciones.create', compact(
+                'estudiantes', 'ofertas', 'unidadSeleccionada', 'ofertaPreseleccionada', 'estudiantesSinDomicilio',
+            ))
+                ->with('error', $unidadSeleccionada
+                    ? 'No hay ofertas abiertas en '.$unidadSeleccionada->nombre_ued.' en este momento.'
+                    : 'No hay ofertas abiertas para postulación en este momento.');
+        }
+
+        return view('tutor.postulaciones.create', compact(
+            'estudiantes', 'ofertas', 'unidadSeleccionada', 'ofertaPreseleccionada', 'estudiantesSinDomicilio',
+        ));
     }
 
     public function store(StoreTutorPostulacionRequest $request): RedirectResponse
@@ -86,11 +122,24 @@ class TutorPostulacionController extends Controller
 
         abort_unless($oferta->estaAbiertaParaPostulacion(), 403, 'La oferta seleccionada no se encuentra dentro del periodo de postulación.');
 
-        $this->postulacionService->create($request->validated());
+        $postulacion = $this->postulacionService->create($request->validated());
+
+        $proximidad = $this->proximidad->calcularParaPostulacion($postulacion);
+
+        $mensaje = 'Postulación registrada correctamente.';
+        if ($proximidad !== null && ($proximidad['ok'] ?? false)) {
+            $mensaje .= sprintf(
+                ' Proximidad al colegio: %.2f km (puntaje geográfico %.1f).',
+                $proximidad['distancia_km'] ?? 0,
+                $proximidad['puntaje'] ?? 0,
+            );
+        } elseif ($proximidad !== null && isset($proximidad['motivo'])) {
+            $mensaje .= ' Proximidad: '.$proximidad['motivo'];
+        }
 
         return redirect()
             ->route('tutor.postulaciones.index')
-            ->with('success', 'Postulación registrada correctamente.');
+            ->with('success', $mensaje);
     }
 
     public function show(Request $request, Postulacion $postulacion): View

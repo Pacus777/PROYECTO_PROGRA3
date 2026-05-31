@@ -48,6 +48,9 @@ class EstudianteService
                 'codigo_est' => $codigo,
                 'rude_est' => $rude,
                 'id_ued_mat_est' => $data['id_ued_mat_est'] ?? null,
+                'direccion_est' => $data['direccion_est'] ?? null,
+                'lat_est' => $data['lat_est'] ?? null,
+                'lng_est' => $data['lng_est'] ?? null,
             ]);
         });
     }
@@ -83,6 +86,13 @@ class EstudianteService
                 $attrs['id_ued_mat_est'] = $data['id_ued_mat_est'] !== '' && $data['id_ued_mat_est'] !== null
                     ? (int) $data['id_ued_mat_est']
                     : null;
+            }
+            foreach (['direccion_est', 'lat_est', 'lng_est'] as $field) {
+                if (array_key_exists($field, $data)) {
+                    $attrs[$field] = $data[$field] !== '' && $data[$field] !== null
+                        ? $data[$field]
+                        : null;
+                }
             }
             if ($attrs !== []) {
                 $estudiante->update($attrs);

@@ -69,7 +69,7 @@
                 <a href="{{ $cancelUrl }}" class="text-sm font-medium text-slate-500 hover:text-slate-800">Cancelar</a>
             @elseif($modal)
                 <button type="button" class="text-sm font-medium text-slate-500 hover:text-slate-800"
-                        x-on:click="window.dispatchEvent(new CustomEvent('close-modal', { detail: @js($modal) }))">
+                        onclick="window.cerrarModal(@js($modal))">
                     Cancelar
                 </button>
             @endif
@@ -95,7 +95,7 @@
 @once
     @push('scripts')
         <script>
-            document.addEventListener('alpine:init', () => {
+            function registerFormWizard() {
                 Alpine.data('formWizard', (config = {}) => ({
                     currentStep: 0,
                     totalSteps: config.totalSteps ?? 1,
@@ -119,6 +119,9 @@
                         const fields = panel.querySelectorAll('input, select, textarea');
                         for (const field of fields) {
                             if (field.disabled || field.type === 'hidden') {
+                                continue;
+                            }
+                            if (field.offsetParent === null) {
                                 continue;
                             }
                             if (!field.checkValidity()) {
@@ -174,7 +177,7 @@
                     init() {
                         for (let i = 0; i < this.totalSteps; i++) {
                             const panel = this.panelFor(i);
-                            if (panel && panel.querySelector('.text-rose-600, [aria-invalid=true], :invalid')) {
+                            if (panel && panel.querySelector('.text-rose-600')) {
                                 this.currentStep = i;
                                 break;
                             }
@@ -182,7 +185,12 @@
                         this.notifyStepVisible();
                     },
                 }));
-            });
+            }
+
+            document.addEventListener('alpine:init', registerFormWizard);
+            if (window.Alpine) {
+                registerFormWizard();
+            }
         </script>
     @endpush
 @endonce

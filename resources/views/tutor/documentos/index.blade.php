@@ -50,7 +50,7 @@
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Estudiante</th>
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Tipo</th>
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Estado</th>
-                            <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">OCR</th>
+                            <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Lectura</th>
                             <th class="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">Acciones</th>
                         </tr>
                     </thead>

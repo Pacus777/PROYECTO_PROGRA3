@@ -41,6 +41,7 @@ Route::get('/postulaciones', [PostulacionController::class, 'index'])->name('pos
 Route::get('/postulaciones/export', [InstitucionalReporteController::class, 'exportPostulaciones'])->name('postulaciones.export');
 Route::get('/postulaciones/{postulacion}', [PostulacionController::class, 'show'])->name('postulaciones.show');
 Route::patch('/postulaciones/{postulacion}', [PostulacionController::class, 'update'])->name('postulaciones.update');
+Route::post('/postulaciones/{postulacion}/proximidad', [PostulacionController::class, 'calcularProximidad'])->name('postulaciones.proximidad');
 
 Route::get('/reportes', [InstitucionalReporteController::class, 'index'])->name('reportes.index');
 Route::prefix('reportes/export')->name('reportes.export.')->group(function (): void {
@@ -76,5 +77,7 @@ Route::post('/lista-espera/{lista_espera}/asignar-cupo', [ListaEsperaController:
 Route::get('/historial', [HistorialController::class, 'index'])->name('historial.index');
 
 Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+Route::get('/documentos/{documento}', [DocumentoController::class, 'show'])->name('documentos.show');
+Route::post('/documentos/{documento}/ocr', [DocumentoController::class, 'reprocessOcr'])->name('documentos.ocr');
 Route::patch('/documentos/{documento}/estado', [DocumentoController::class, 'updateEstado'])->name('documentos.estado');
 Route::get('/documentos/{documento}/download', [DocumentoController::class, 'download'])->name('documentos.download');

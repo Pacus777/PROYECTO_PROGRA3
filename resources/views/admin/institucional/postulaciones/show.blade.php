@@ -23,6 +23,11 @@
             {{ session('success') }}
         </div>
     @endif
+    @if(session('error'))
+        <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -47,6 +52,16 @@
                 <div><dt class="text-slate-500">Código (codigo_est)</dt><dd class="font-mono">{{ $est->codigo_est ?? '—' }}</dd></div>
                 <div><dt class="text-slate-500">CI (ci_per)</dt><dd>{{ $per->ci_per ?? '—' }}</dd></div>
                 <div><dt class="text-slate-500">UE matrícula actual</dt><dd>{{ $est->unidadMatriculaActual->nombre_ued ?? 'Sin registrar' }}</dd></div>
+                <div><dt class="text-slate-500">Domicilio</dt><dd>{{ $est->direccion_est ?? 'Sin registrar' }}</dd></div>
+                <div><dt class="text-slate-500">Coordenadas vivienda</dt>
+                    <dd class="font-mono text-xs">
+                        @if($est->lat_est && $est->lng_est)
+                            {{ number_format((float) $est->lat_est, 6) }}, {{ number_format((float) $est->lng_est, 6) }}
+                        @else
+                            <span class="text-amber-700">Sin georreferenciar</span>
+                        @endif
+                    </dd>
+                </div>
             </dl>
         </section>
 
@@ -151,6 +166,49 @@
             @endif
         </section>
     </div>
+
+    <section class="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+        <div class="mb-4 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h2 class="text-sm font-bold uppercase tracking-wide text-slate-400">Proximidad geográfica (A*)</h2>
+                <p class="mt-1 text-xs text-slate-500">
+                    El algoritmo A* estima la distancia vivienda → colegio y genera el puntaje del criterio «Distancia domicilio».
+                </p>
+            </div>
+            <form method="POST" action="{{ route('admin.institucional.postulaciones.proximidad', $postulacion) }}">
+                @csrf
+                <button type="submit"
+                        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                    Calcular / recalcular proximidad
+                </button>
+            </form>
+        </div>
+
+        @if($proximidadPreview)
+            <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <dt class="text-xs font-semibold uppercase text-slate-400">Distancia A*</dt>
+                    <dd class="mt-1 text-lg font-bold text-indigo-600">{{ number_format($proximidadPreview['distancia_km'], 2) }} km</dd>
+                </div>
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <dt class="text-xs font-semibold uppercase text-slate-400">Lineal (Haversine)</dt>
+                    <dd class="mt-1 font-semibold text-slate-800">{{ number_format($proximidadPreview['distancia_lineal_km'] ?? $proximidadPreview['lineal_km'] ?? 0, 2) }} km</dd>
+                </div>
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <dt class="text-xs font-semibold uppercase text-slate-400">Pasos en cuadrícula</dt>
+                    <dd class="mt-1 font-semibold text-slate-800">{{ $proximidadPreview['pasos'] ?? 0 }}</dd>
+                </div>
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <dt class="text-xs font-semibold uppercase text-slate-400">Puntaje geográfico</dt>
+                    <dd class="mt-1 text-lg font-bold text-emerald-600">{{ number_format($proximidadPreview['puntaje'], 1) }} / 100</dd>
+                </div>
+            </dl>
+        @else
+            <p class="text-sm text-amber-800">
+                Registre el domicilio del estudiante (lat/lng) y las coordenadas del colegio para calcular proximidad.
+            </p>
+        @endif
+    </section>
 
     <section class="mt-6 rounded-2xl bg-white p-6 shadow-sm">
         <h2 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">Evaluaciones (tabla evaluacion)</h2>

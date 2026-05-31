@@ -31,6 +31,7 @@
 
             <x-ui.form-wizard-step :index="1" title="Datos del postulante">
                 @include('admin.estudiantes._form-personal', ['estudiante' => null])
+                @include('admin.estudiantes._domicilio', ['estudiante' => null])
             </x-ui.form-wizard-step>
 
             <x-ui.form-wizard-step :index="2" title="Revisar">

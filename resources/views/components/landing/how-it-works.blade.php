@@ -10,9 +10,9 @@
             <div class="grid lg:grid-cols-3 gap-10 relative">
                 @php
                     $steps = [
-                        ['n'=>'01','t'=>'Cuenta de tutor','d'=>'Regístrate como tutor o apoderado (papá, mamá u otro responsable). Los postulantes no necesitan usuario propio.'],
-                        ['n'=>'02','t'=>'Vincula con el RUDE','d'=>'Ingresa el RUDE de tu hijo o hija para vincularlo y completar la postulación con la oferta y documentos requeridos.'],
-                        ['n'=>'03','t'=>'Seguimiento y resultado','d'=>'Consulta el estado de la admisión en tiempo real hasta la publicación de cupos y resultados.'],
+                        ['n'=>'01','t'=>'Elija un colegio','d'=>'Explore el catálogo, revise convocatorias abiertas y entre al colegio donde desea postular.'],
+                        ['n'=>'02','t'=>'Registro de tutor','d'=>'Cree su cuenta con CI, correo y el RUDE de su hijo. El formulario lo guía paso a paso.'],
+                        ['n'=>'03','t'=>'Postule y haga seguimiento','d'=>'Complete la postulación, suba documentos y consulte resultados en tiempo real.'],
                     ];
                 @endphp
                 @foreach($steps as $s)

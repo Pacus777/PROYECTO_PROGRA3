@@ -22,4 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-.env.example
+
+/tools/WinOcr/bin/
+/tools/WinOcr/obj/
+/tools/WinOcr/publish/

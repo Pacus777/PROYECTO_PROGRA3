@@ -17,7 +17,7 @@
         <div class="flex flex-wrap gap-2">
             <x-admin.export-report route="admin.usuarios.export" />
             <button type="button"
-                    @click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'usuario-create' }))"
+                    onclick="window.abrirModal('usuario-create')"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:from-indigo-700 hover:to-purple-700">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                 Nuevo usuario

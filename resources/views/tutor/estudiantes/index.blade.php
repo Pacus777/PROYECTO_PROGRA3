@@ -115,7 +115,16 @@
                                     </td>
                                     <td class="px-6 py-4 text-slate-600">{{ $p->ci_per ?? '—' }}</td>
                                     <td class="px-6 py-4 text-right">
-                                        <form method="POST"
+                                        <div class="flex flex-col items-end gap-2">
+                                            <a href="{{ route('tutor.estudiantes.domicilio.edit', $est) }}"
+                                               class="inline-flex items-center gap-1 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 hover:bg-teal-100">
+                                                @if($est->lat_est && $est->lng_est)
+                                                    Editar domicilio
+                                                @else
+                                                    Registrar domicilio
+                                                @endif
+                                            </a>
+                                            <form method="POST"
                                               action="{{ route('tutor.estudiantes.destroy', $est) }}"
                                               class="inline"
                                               onsubmit="return confirm('¿Desvincular a {{ $nombre ?: 'este estudiante' }} de tu perfil?');">
@@ -126,6 +135,7 @@
                                                 Desvincular
                                             </button>
                                         </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

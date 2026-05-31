@@ -11,7 +11,13 @@
     <div class="mb-6">
         <p class="text-xs text-slate-400">Tutor / Postulaciones / Crear</p>
         <h1 class="text-2xl font-bold text-slate-900">Registrar postulación</h1>
-        <p class="mt-1 text-sm text-slate-500">El estado inicial se asigna con la misma lógica que la API (<code class="rounded bg-slate-100 px-1 text-xs">borrador</code> por defecto vía servicio).</p>
+        @if(!empty($unidadSeleccionada))
+            <p class="mt-2 text-sm text-blue-700 font-medium">
+                Colegio seleccionado: {{ $unidadSeleccionada->nombre_ued }}
+                <a href="{{ route('colegios.show', $unidadSeleccionada) }}" class="ml-2 text-blue-600 hover:underline font-normal">Ver ficha</a>
+            </p>
+        @endif
+        <p class="mt-1 text-sm text-slate-500">Seleccione el estudiante vinculado y la oferta académica abierta.</p>
     </div>
 
     @if(session('error'))
@@ -27,6 +33,26 @@
             <p class="font-semibold">No puedes realizar esta acción porque la oferta ya cerró su periodo de postulación.</p>
         </div>
     @else
+        @if(($estudiantesSinDomicilio ?? collect())->isNotEmpty())
+            <div class="mb-6 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+                <p class="font-semibold">Registre el domicilio antes de postular</p>
+                <p class="mt-2 text-sm text-amber-900">
+                    Antes de postular, indique en el mapa dónde vive cada estudiante. Esa ubicación se usa para evaluar la cercanía al colegio dentro del criterio «Distancia domicilio».
+                </p>
+                <ul class="mt-3 space-y-2 text-sm">
+                    @foreach($estudiantesSinDomicilio as $est)
+                        @php $nom = trim(($est->persona->nombres_per ?? '').' '.($est->persona->ap_paterno_per ?? '')); @endphp
+                        <li>
+                            <a href="{{ route('tutor.estudiantes.domicilio.edit', ['estudiante' => $est, 'return' => url()->current() . '?' . http_build_query(request()->query())]) }}"
+                               class="font-semibold text-teal-700 hover:underline">
+                                Registrar domicilio de {{ $nom ?: 'estudiante #'.$est->id_est }} →
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('tutor.postulaciones.store') }}" class="max-w-3xl space-y-6 rounded-2xl bg-white p-8 shadow-sm">
             @csrf
             <div>
@@ -35,9 +61,15 @@
                     <option value="">Seleccione…</option>
                     @foreach($estudiantes as $est)
                         @php $nom = trim(($est->persona->nombres_per ?? '').' '.($est->persona->ap_paterno_per ?? '').' '.($est->persona->ap_materno_per ?? '')); @endphp
-                        <option value="{{ $est->id_est }}" @selected(old('id_est_pos') == $est->id_est)>{{ $nom ?: 'Estudiante #'.$est->id_est }}</option>
+                        <option value="{{ $est->id_est }}" @selected(old('id_est_pos') == $est->id_est)>
+                            {{ $nom ?: 'Estudiante #'.$est->id_est }}
+                            @if($est->lat_est && $est->lng_est) ✓ domicilio @else — sin domicilio @endif
+                        </option>
                     @endforeach
                 </select>
+                @error('id_est_pos')
+                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
             <div>
                 <label for="id_oac_pos" class="block text-sm font-semibold text-slate-700">Oferta académica</label>
@@ -53,7 +85,7 @@
                                 $oac->paralelo->nombre_par ?? null,
                             ])));
                         @endphp
-                        <option value="{{ $oac->id_oac }}" @selected(old('id_oac_pos') == $oac->id_oac)>{{ $label ?: 'Oferta #'.$oac->id_oac }}</option>
+                        <option value="{{ $oac->id_oac }}" @selected(old('id_oac_pos', $ofertaPreseleccionada ?? null) == $oac->id_oac)>{{ $label ?: 'Oferta #'.$oac->id_oac }}</option>
                     @endforeach
                 </select>
                 @error('id_oac_pos')

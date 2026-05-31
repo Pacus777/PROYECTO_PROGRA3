@@ -7,12 +7,17 @@ namespace App\Services;
 use App\Models\Documento;
 use App\Models\ProcesamientoOcr;
 use App\Models\Postulacion;
+use App\Services\Ocr\DocumentOcrService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentoService
 {
+    public function __construct(
+        private readonly DocumentOcrService $ocrService,
+    ) {}
+
     public function upload(Postulacion $postulacion, int $tipoId, UploadedFile $archivo): Documento
     {
         return DB::transaction(function () use ($postulacion, $tipoId, $archivo): Documento {
@@ -31,6 +36,8 @@ class DocumentoService
                 'id_doc_poc' => $documento->id_doc,
                 'estado_poc' => 'pendiente',
             ]);
+
+            $this->ocrService->dispatchProcessing($documento);
 
             return $documento;
         });

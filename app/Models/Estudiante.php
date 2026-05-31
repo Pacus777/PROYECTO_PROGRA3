@@ -18,7 +18,18 @@ class Estudiante extends Model
         'codigo_est',
         'rude_est',
         'id_ued_mat_est',
+        'direccion_est',
+        'lat_est',
+        'lng_est',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'lat_est' => 'float',
+            'lng_est' => 'float',
+        ];
+    }
 
     public function getRouteKeyName(): string
     {
@@ -55,5 +66,14 @@ class Estudiante extends Model
     public function resumenesBoletin(): HasMany
     {
         return $this->hasMany(ResumenBoletin::class, 'id_est_rbo', 'id_est');
+    }
+
+    public function tieneDomicilioRegistrado(): bool
+    {
+        $direccion = is_string($this->direccion_est) ? trim($this->direccion_est) : '';
+
+        return $direccion !== ''
+            && $this->lat_est !== null
+            && $this->lng_est !== null;
     }
 }
